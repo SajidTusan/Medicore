@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
 class Role(models.TextChoices):
     ADMIN = "ADMIN", "Admin"
     DOCTOR = "DOCTOR", "Doctor"
@@ -27,17 +26,21 @@ class User(AbstractUser):
     is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        # যদি ইউজারটি সুপারইউজার হয়, তবে তার রোল স্বয়ংক্রিয়ভাবে ADMIN করে দেওয়া হচ্ছে
+        if self.is_superuser and self.role == Role.PATIENT:
+            self.role = Role.ADMIN
+            self.is_verified = True  # সুপারইউজারকে অটো-ভেরিফাইড মার্ক করা হলো
 
         if not self.public_id:
-
+            # এখানে self.Role এর পরিবর্তে সরাসরি Role ক্লাস ব্যবহার করা হয়েছে
             prefixes = {
-                self.Role.ADMIN: "ADM",
-                self.Role.DOCTOR: "DOC",
-                self.Role.NURSE: "NUR",
-                self.Role.PATIENT: "PAT",
-                self.Role.LAB: "LAB",
-                self.Role.PHARMACIST: "PHA",
-                self.Role.RECEPTIONIST: "REC",
+                Role.ADMIN: "ADM",
+                Role.DOCTOR: "DOC",
+                Role.NURSE: "NUR",
+                Role.PATIENT: "PAT",
+                Role.LAB: "LAB",
+                Role.PHARMACIST: "PHA",
+                Role.RECEPTIONIST: "REC",
             }
 
             prefix = prefixes.get(

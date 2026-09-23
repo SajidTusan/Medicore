@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
+
 from apps.hospitals.models import Hospital, Department
+
 
 class NurseProfile(models.Model):
 
@@ -8,6 +10,22 @@ class NurseProfile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="nurse_profile",
+    )
+
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="nurses",
+    )
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="nurses",
     )
 
     qualification = models.CharField(
@@ -38,25 +56,12 @@ class NurseProfile(models.Model):
         default=0,
     )
 
-    hospital = models.ForeignKey(
-    Hospital,
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name="nurses",
-    )
-    
-    department = models.ForeignKey(
-    Department,
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name="nurses",
-    )
-    
     is_available_for_homecare = models.BooleanField(
         default=False,
     )
 
     def __str__(self):
-        return f"{self.user.get_full_name()} - {self.user.public_id}"
+        return (
+            f"{self.user.get_full_name()} - "
+            f"{self.user.public_id}"
+        )

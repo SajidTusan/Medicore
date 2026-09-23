@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Nurse Dashboard</h1>
+
+        <p class="text-muted">
+            Welcome back,
+            {{ request.user.get_full_name }}
+        </p>
+    </div>
+
+</div>
+
+
+<!-- Nurse Summary -->
+
+<div class="dashboard-grid">
+
+
+    <!-- Hospital -->
+
+    <div class="card">
+
+        <div class="card-icon">
+            🏥
+        </div>
+
+        <h3>Hospital</h3>
+
+        <strong>
+            {% if profile and profile.hospital %}
+                {{ profile.hospital.name }}
+            {% else %}
+                Not Assigned
+            {% endif %}
+        </strong>
+
+        <p>
+            Current hospital
+        </p>
+
+    </div>
+
+
+    <!-- Department -->
+
+    <div class="card">
+
+        <div class="card-icon">
+            🩺
+        </div>
+
+        <h3>Department</h3>
+
+        <strong>
+
+            {% if profile and profile.department %}
+                {{ profile.department.name }}
+            {% else %}
+                Not Assigned
+            {% endif %}
+
+        </strong>
+
+        <p>
+            Current department
+        </p>
+
+    </div>
+
+
+    <!-- Experience -->
+
+    <div class="card">
+
+        <div class="card-icon">
+            👩‍⚕️
+        </div>
+
+        <h3>Experience</h3>
+
+        <strong>
+
+            {% if profile %}
+                {{ profile.experience_years }}
+            {% else %}
+                0
+            {% endif %}
+
+        </strong>
+
+        <p>
+            Years of experience
+        </p>
+
+    </div>
+
+
+    <!-- Home Care -->
+
+    <div class="card">
+
+        <div class="card-icon">
+            🏠
+        </div>
+
+        <h3>Home Care</h3>
+
+        {% if profile and profile.is_available_for_homecare %}
+
+            <strong>
+                Available
+            </strong>
+
+            <p>
+                You can receive home-care requests.
+            </p>
+
+        {% else %}
+
+            <strong>
+                Unavailable
+            </strong>
+
+            <p>
+                Home-care requests are disabled.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+
+<!-- Quick Actions -->
+
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+
+            <h2>Quick Actions</h2>
+
+            <p class="text-muted">
+                Manage your nursing activities
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+        <a
+            href="{% url 'nurses:profile' %}"
+            class="btn btn-primary"
+        >
+            My Profile
+        </a>
+
+
+        <a
+            href="#"
+            class="btn btn-secondary"
+        >
+            My Schedule
+        </a>
+
+
+        <a
+            href="#"
+            class="btn btn-secondary"
+        >
+            Home Care
+        </a>
+
+
+        <a
+            href="#"
+            class="btn btn-secondary"
+        >
+            Care Requests
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- Today's Duty -->
+
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+
+            <h2>Today's Duty</h2>
+
+            <p class="text-muted">
+                Your hospital and home-care schedule
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="empty-state">
+
+        <h3>No schedule available</h3>
+
+        <p>
+            Your schedule will appear here once it is created.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

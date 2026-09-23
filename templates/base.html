@@ -1,116 +1,93 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>{% block title %}MediCore{% endblock %}</title>
-
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
     <link rel="stylesheet" href="{% static 'css/pages.css' %}">
 </head>
-
 <body>
-
     <div class="app-shell">
-
         <aside class="sidebar">
-
             <div class="brand">
                 <div class="brand-icon">M</div>
-
                 <div>
                     <h2>MediCore</h2>
                     <span>Healthcare Platform</span>
                 </div>
             </div>
-
             <nav class="sidebar-nav">
-
+                <!-- Existing General Menu -->
                 <a href="#" class="nav-item active">
-                    <span>⌂</span>
-                    Dashboard
+                    <span>⌂</span> Dashboard
                 </a>
-
                 <a href="#" class="nav-item">
-                    <span>◷</span>
-                    Appointments
+                    <span>◷</span> Appointments
                 </a>
-
                 <a href="#" class="nav-item">
-                    <span>♙</span>
-                    Doctors
+                    <span>♙</span> Doctors
                 </a>
-
                 <a href="#" class="nav-item">
-                    <span>▣</span>
-                    Medical Records
+                    <span>▣</span> Medical Records
                 </a>
-
                 <a href="#" class="nav-item">
-                    <span>✚</span>
-                    Prescriptions
+                    <span>✚</span> Prescriptions
                 </a>
-
                 <a href="#" class="nav-item">
-                    <span>⌁</span>
-                    Laboratory
+                    <span>⌁</span> Laboratory
                 </a>
 
+                <!-- Added Nurse-Specific Menu (Using existing 'nav-item' class) -->
+                {% if request.user.role == "NURSE" %}
+                    <a href="{% url 'nurses:dashboard' %}" class="nav-item">
+                        <span>⌂</span> Dashboard
+                    </a>
+                    <a href="{% url 'nurses:profile' %}" class="nav-item">
+                        <span>👤</span> Profile
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span>📅</span> Schedule
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span>🏠</span> Home Care
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span>📩</span> Care Requests
+                    </a>
+                {% endif %}
             </nav>
-
         </aside>
-
-
+        
         <main class="main-content">
-
             <header class="topbar">
-
                 <div>
                     <span class="page-label">Healthcare Management</span>
-
                     <h1>
-                        {% block page_heading %}
-                        Dashboard
-                        {% endblock %}
+                        {% block page_heading %} Dashboard {% endblock %}
                     </h1>
                 </div>
-
                 <div class="topbar-actions">
-
                     <button class="icon-button">
                         🔔
                     </button>
-
                     <div class="user-mini">
                         <div class="avatar">S</div>
-
                         <div>
                             <strong>Guest User</strong>
                             <span>Patient</span>
                         </div>
                     </div>
-
                 </div>
-
             </header>
-
-
             <section class="page-content">
-
                 {% block content %}
                 {% endblock %}
-
             </section>
-
         </main>
-
     </div>
-
     <script src="{% static 'js/app.js' %}"></script>
-
 </body>
 </html>
