@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Doctor Dashboard</h1>
+        <p class="text-muted">
+            Welcome back, Dr. {{ request.user.get_full_name }}
+        </p>
+    </div>
+
+</div>
+
+
+<div class="dashboard-grid">
+
+    <div class="card">
+
+        <div class="card-icon">
+            🗓️
+        </div>
+
+        <h3>Today's Appointments</h3>
+
+        <strong>0</strong>
+
+        <p>Appointments scheduled today</p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">
+            👥
+        </div>
+
+        <h3>Total Patients</h3>
+
+        <strong>0</strong>
+
+        <p>Patients under your care</p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">
+            ✅
+        </div>
+
+        <h3>Completed</h3>
+
+        <strong>0</strong>
+
+        <p>Completed consultations</p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">
+            ⏰
+        </div>
+
+        <h3>Upcoming</h3>
+
+        <strong>0</strong>
+
+        <p>Upcoming appointments</p>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Quick Actions</h2>
+            <p class="text-muted">
+                Frequently used doctor tools
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+        <a href="#" class="btn btn-primary">
+            View Appointments
+        </a>
+
+        <a href="#" class="btn btn-secondary">
+            Search Patient
+        </a>
+
+        <a href="{% url 'doctors:profile' %}"
+           class="btn btn-secondary">
+            My Profile
+        </a>
+
+        <a href="#" class="btn btn-secondary">
+            My Schedule
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

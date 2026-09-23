@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
+
 from apps.hospitals.models import Hospital, Department
+
 
 class DoctorProfile(models.Model):
 
@@ -43,22 +45,22 @@ class DoctorProfile(models.Model):
         decimal_places=2,
         default=0,
     )
-    
+
     hospital = models.ForeignKey(
-    Hospital,
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name="doctors",
+        Hospital,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="doctors",
     )
-    
+
     department = models.ForeignKey(
-    Department,
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name="doctors",
+        Department,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="doctors",
     )
-    
+
     def __str__(self):
         return f"Dr. {self.user.get_full_name()} - {self.user.public_id}"
