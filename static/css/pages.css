@@ -1,0 +1,32 @@
+.page-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+
+.stat-card {
+    padding: 22px;
+}
+
+
+.stat-label {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+
+@media (max-width: 900px) {
+
+    .page-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
