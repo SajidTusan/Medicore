@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}
+Login | MediCore
+{% endblock %}
+
+{% block page_heading %}
+Login
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+        <div>
+            <div class="card-title">
+                Sign in to MediCore
+            </div>
+
+            <p>
+                Access your healthcare dashboard.
+            </p>
+        </div>
+    </div>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {% for field in form %}
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.errors %}
+                    <small>
+                        {{ field.errors }}
+                    </small>
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Sign In
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
