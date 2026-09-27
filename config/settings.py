@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "apps.appointments.apps.AppointmentsConfig",
     "apps.medical_records.apps.MedicalRecordsConfig",
     "apps.pharmacy.apps.PharmacyConfig",
+    "apps.billing.apps.BillingConfig",
 ]
 
 MIDDLEWARE = [
