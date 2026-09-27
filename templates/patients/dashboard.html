@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Patient Portal</p>
+        <h1>Patient Dashboard</h1>
+        <p class="text-muted">
+            Welcome back, {{ request.user.get_full_name|default:request.user.username }}.
+        </p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+
+    <div class="card">
+        <h3>Patient ID</h3>
+        <p>{{ request.user.public_id }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Upcoming Appointments</h3>
+        <p>0</p>
+    </div>
+
+    <div class="card">
+        <h3>Lab Reports</h3>
+        <p>0</p>
+    </div>
+
+    <div class="card">
+        <h3>Prescriptions</h3>
+        <p>0</p>
+    </div>
+
+</div>
+
+{% endblock %}

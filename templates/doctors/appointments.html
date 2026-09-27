@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Appointment Requests</h1>
+      <p>Manage your patient appointments.</p>
+    </div>
+
+    {% if appointments %}
+      <div class="card">
+        <div class="card-body">
+          {% for appointment in appointments %}
+            <div class="appointment-item">
+              <div>
+                <h3>{{ appointment.patient.get_full_name }}</h3>
+
+                <p>Patient ID:
+                  {{ appointment.patient.public_id }}</p>
+
+                <p>Department:
+                  {{ appointment.department.name }}</p>
+              </div>
+
+              <div>
+                <p>
+                  <strong>Date:</strong>
+                  {{ appointment.date|date:'d M Y' }}
+                </p>
+
+                <p>
+                  <strong>Time:</strong>
+                  {{ appointment.start_time|time:'g:i A' }}
+                  -
+                  {{ appointment.end_time|time:'g:i A' }}
+                </p>
+
+                <p>
+                  <strong>Status:</strong>
+                  {{ appointment.get_status_display }}
+                </p>
+
+                {% if appointment.status == 'PENDING' %}
+                  <div style="margin-top: 12px;">
+                    <form method="post" action="{% url 'doctors:update_appointment_status' appointment.id 'CONFIRMED' %}" style="display: inline;">
+                      {% csrf_token %}
+
+                      <button type="submit" class="btn btn-primary">Confirm</button>
+                    </form>
+
+                    <form method="post" action="{% url 'doctors:update_appointment_status' appointment.id 'CANCELLED' %}" style="display: inline;">
+                      {% csrf_token %}
+
+                      <button type="submit" class="btn btn-danger">Cancel</button>
+                    </form>
+                  </div>
+                {% elif appointment.status == 'CONFIRMED' %}
+                  <div style="margin-top: 12px;">
+                    <form method="post" action="{% url 'doctors:update_appointment_status' appointment.id 'COMPLETED' %}" style="display: inline;">
+                      {% csrf_token %}
+
+                      <button type="submit" class="btn btn-primary">Mark Completed</button>
+                      <a href="{% url 'medical_records:create_consultation' appointment.id %}" class="btn btn-primary" style="margin-left: 8px;">Open Consultation</a>
+                    </form>
+
+                    <form method="post" action="{% url 'doctors:update_appointment_status' appointment.id 'NO_SHOW' %}" style="display: inline;">
+                      {% csrf_token %}
+
+                      <button type="submit" class="btn btn-secondary">Mark No Show</button>
+                    </form>
+                  </div>
+                {% endif %}
+
+                {% if appointment.reason %}
+                  <p style="margin-top: 12px;">
+                    <strong>Reason:</strong>
+                    {{ appointment.reason }}
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if not forloop.last %}
+              <hr />
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="card">
+        <div class="card-body">
+          <h2>No Appointments</h2>
+          <p>You currently have no appointment requests.</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

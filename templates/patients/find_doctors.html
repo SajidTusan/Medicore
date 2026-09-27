@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Patient Portal</p>
+
+        <h1>Find a Doctor</h1>
+
+        <p class="text-muted">
+            Find doctors by name, specialization, or department.
+        </p>
+    </div>
+</div>
+
+
+<div class="card">
+
+    <form method="get">
+
+        <div class="form-group">
+
+            <label for="doctor-search">
+                Search Doctor
+            </label>
+
+            <input
+                id="doctor-search"
+                type="text"
+                name="q"
+                value="{{ query }}"
+                placeholder="e.g. Cardiologist, Dermatologist, Rahman..."
+            >
+
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Search
+        </button>
+
+        {% if query %}
+            <a
+                href="{% url 'patients:find_doctors' %}"
+                class="btn"
+            >
+                Clear
+            </a>
+        {% endif %}
+
+    </form>
+
+</div>
+
+
+<div class="page-section">
+
+    <div class="section-header">
+
+        <div>
+            <h2>Available Doctors</h2>
+
+            <p class="text-muted">
+                {{ doctors|length }} doctor{{ doctors|length|pluralize }} found.
+            </p>
+        </div>
+
+    </div>
+
+
+    {% if doctors %}
+
+        <div class="doctor-grid">
+
+            {% for doctor in doctors %}
+
+                <div class="card doctor-card">
+
+                    <div class="doctor-card-header">
+
+                        <div class="doctor-avatar">
+                            {{ doctor.user.first_name|first|upper }}
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Dr. {{ doctor.user.get_full_name }}
+                            </h3>
+
+                            <p class="text-muted">
+                                {{ doctor.specialization|default:"General Physician" }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="doctor-card-body">
+
+                        {% if doctor.qualification %}
+                            <p>
+                                <strong>Qualification:</strong>
+                                {{ doctor.qualification }}
+                            </p>
+                        {% endif %}
+
+                        <p>
+                            <strong>Experience:</strong>
+                            {{ doctor.experience_years }} years
+                        </p>
+
+                        {% if doctor.department %}
+                            <p>
+                                <strong>Department:</strong>
+                                {{ doctor.department.name }}
+                            </p>
+                        {% endif %}
+
+                        {% if doctor.hospital %}
+                            <p>
+                                <strong>Hospital:</strong>
+                                {{ doctor.hospital.name }}
+                            </p>
+                        {% endif %}
+
+                        <p>
+                            <strong>Consultation:</strong>
+                            ৳{{ doctor.consultation_fee }}
+                        </p>
+
+                    </div>
+
+
+                    <div class="doctor-card-footer">
+
+                        <a
+                            href="{% url 'patients:doctor_detail' doctor.id %}"
+                            class="btn btn-primary"
+                        >
+                            View Profile
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card empty-state">
+
+            <h3>No doctors found</h3>
+
+            <p class="text-muted">
+                Try searching with another doctor name,
+                specialization, or department.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

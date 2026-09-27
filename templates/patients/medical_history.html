@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>Medical History</h1>
+        <p>Your previous consultations, diagnoses and prescriptions.</p>
+    </div>
+
+    {% if consultations %}
+
+        {% for consultation in consultations %}
+
+            <div class="card" style="margin-bottom: 24px;">
+
+                <div class="card-body">
+
+                    <h2>
+                        Consultation
+                    </h2>
+
+                    <p>
+                        <strong>Date:</strong>
+                        {{ consultation.created_at|date:"d M Y" }}
+                    </p>
+
+                    <p>
+                        <strong>Doctor:</strong>
+                        Dr. {{ consultation.doctor.get_full_name }}
+                    </p>
+
+                    <hr>
+
+                    <p>
+                        <strong>Chief Complaint:</strong>
+                        {{ consultation.chief_complaint }}
+                    </p>
+
+                    <p>
+                        <strong>Symptoms:</strong>
+                        {{ consultation.symptoms|default:"Not provided." }}
+                    </p>
+
+                    <p>
+                        <strong>Diagnosis:</strong>
+                        {{ consultation.diagnosis|default:"Not provided." }}
+                    </p>
+
+                    <p>
+                        <strong>Clinical Notes:</strong>
+                        {{ consultation.clinical_notes|default:"Not provided." }}
+                    </p>
+
+                    {% if consultation.follow_up_date %}
+
+                        <p>
+                            <strong>Follow-up:</strong>
+                            {{ consultation.follow_up_date|date:"d M Y" }}
+                        </p>
+
+                    {% endif %}
+
+                    {% if consultation.prescription %}
+
+                        <hr>
+
+                        <h3>Prescription</h3>
+
+                        <p>
+                            <strong>
+                                Prescription ID:
+                            </strong>
+
+                            {{ consultation.prescription.prescription_id }}
+                        </p>
+
+                        <h4>Medicines</h4>
+
+                        <ul>
+
+                            {% for medicine in consultation.prescription.medicines.all %}
+
+                                <li style="margin-bottom: 8px;">
+
+                                    <strong>
+                                        {{ medicine.medicine_name }}
+                                    </strong>
+
+                                    <br>
+
+                                    Dosage:
+                                    {{ medicine.dosage }}
+
+                                    <br>
+
+                                    Frequency:
+                                    {{ medicine.frequency }}
+
+                                    <br>
+
+                                    Duration:
+                                    {{ medicine.duration }}
+
+                                    {% if medicine.instructions %}
+
+                                        <br>
+
+                                        Instructions:
+                                        {{ medicine.instructions }}
+
+                                    {% endif %}
+
+                                </li>
+
+                            {% empty %}
+
+                                <li>
+                                    No medicines recorded.
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                        {% if consultation.prescription.advice %}
+
+                            <p>
+                                <strong>Advice:</strong>
+                                {{ consultation.prescription.advice }}
+                            </p>
+
+                        {% endif %}
+
+                        {% if consultation.prescription.tests_advised %}
+
+                            <p>
+                                <strong>Tests Advised:</strong>
+                                {{ consultation.prescription.tests_advised }}
+                            </p>
+
+                        {% endif %}
+
+                        <a
+                            href="{% url 'medical_records:prescription_detail' consultation.prescription.id %}"
+                            class="btn btn-primary"
+                        >
+                            View Prescription
+                        </a>
+
+                    {% else %}
+
+                        <p>
+                            No prescription was created for this consultation.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h2>No Medical History</h2>
+
+                <p>
+                    No previous medical records are available.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+    <!-- Laboratory History Section Added Here -->
+    <hr style="margin: 40px 0;">
+
+    <div class="page-header">
+        <h2>Laboratory History</h2>
+        <p>
+            Your previous laboratory tests and results.
+        </p>
+    </div>
+
+    {% if lab_reports %}
+
+        {% for report in lab_reports %}
+
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body">
+                    <h3>{{ report.test.name }}</h3>
+                    
+                    <p>
+                        <strong>Date:</strong>
+                        {{ report.created_at|date:"d M Y" }}
+                    </p>
+
+                    <p>
+                        <strong>Doctor:</strong>
+                        Dr. {{ report.doctor.get_full_name }}
+                    </p>
+
+                    {% if report.status %}
+                        <p>
+                            <strong>Status:</strong>
+                            {{ report.status }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+            <div class="card-body">
+                <p>No laboratory reports found.</p>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

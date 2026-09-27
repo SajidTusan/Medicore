@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>My Laboratory Reports</h1>
+        <p>View your laboratory tests and results.</p>
+    </div>
+
+    {% if reports %}
+
+        {% for report in reports %}
+
+            <div class="card" style="margin-bottom: 20px;">
+
+                <div class="card-body">
+
+                    <h2>
+                        {{ report.order_id }}
+                    </h2>
+
+                    <p>
+                        <strong>Test:</strong>
+                        {{ report.test.name }}
+                    </p>
+
+                    <p>
+                        <strong>Doctor:</strong>
+                        Dr. {{ report.doctor.get_full_name }}
+                    </p>
+
+                    <p>
+                        <strong>Ordered:</strong>
+                        {{ report.created_at|date:"d M Y" }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {{ report.get_status_display }}
+                    </p>
+
+                    {% if report.result %}
+
+                        <hr>
+
+                        <h3>Test Result</h3>
+
+                        <div>
+                            {{ report.result|linebreaks }}
+                        </div>
+
+                        {% if report.result_date %}
+
+                            <p>
+                                <strong>Result Date:</strong>
+                                {{ report.result_date|date:"d M Y, h:i A" }}
+                            </p>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <p>
+                            Result is not available yet.
+                        </p>
+
+                    {% endif %}
+
+                    {% if report.notes %}
+
+                        <p>
+                            <strong>Laboratory Notes:</strong>
+                            {{ report.notes|linebreaks }}
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h2>No Laboratory Reports</h2>
+
+                <p>
+                    You don't have any laboratory reports yet.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     "apps.doctors",
     "apps.nurses",
     "apps.schedule_manager",
+    "apps.appointments.apps.AppointmentsConfig",
+    "apps.medical_records.apps.MedicalRecordsConfig",
+    "apps.pharmacy.apps.PharmacyConfig",
 ]
 
 MIDDLEWARE = [

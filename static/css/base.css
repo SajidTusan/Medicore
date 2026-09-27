@@ -277,3 +277,29 @@ a {
         padding: 20px;
     }
 }
+@media print {
+
+    .sidebar,
+    .navbar,
+    .header,
+    .btn,
+    button {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .page-container {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    .card {
+        border: none;
+        box-shadow: none;
+    }
+
+}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Create Prescription</h1>
+
+      <p>Create a prescription for this patient.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2>{{ consultation.patient.get_full_name }}</h2>
+
+        <p>
+          Patient ID:
+          <strong>{{ consultation.patient.public_id }}</strong>
+        </p>
+
+        <p>Consultation Date:
+          {{ consultation.created_at|date:'d M Y' }}</p>
+
+        <hr />
+
+        <h2>Medicine</h2>
+
+        <form method="post">
+          {% csrf_token %}
+
+          {{ medicine_form.as_p }}
+
+          <hr />
+
+          <h2>Additional Information</h2>
+
+          {{ medicine_formset.management_form }}
+
+          <div id="medicine-forms">
+            {% for form in medicine_formset %}
+              <div class="medicine-form">
+                {{ form.as_p }}
+
+                {% if not forloop.first %}
+                  <button type="button" class="btn btn-danger remove-medicine">Remove</button>
+                {% endif %}
+
+                <hr />
+              </div>
+            {% endfor %}
+          </div>
+
+          <button type="button" id="add-medicine" class="btn btn-secondary">+ Add Another Medicine</button>
+
+          <button type="submit" class="btn btn-primary">Save Prescription</button>
+
+          <a href="{% url 'medical_records:consultation_detail' consultation.id %}" class="btn btn-secondary">Back</a>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    const medicineContainer = document.getElementById('medicine-forms')
+    
+    const addMedicineButton = document.getElementById('add-medicine')
+    
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS')
+    
+    addMedicineButton.addEventListener('click', function () {
+      const formCount = parseInt(totalForms.value)
+    
+      const firstForm = medicineContainer.children[0]
+    
+      const newForm = firstForm.cloneNode(true)
+    
+      newForm.innerHTML = newForm.innerHTML.replace(/form-0-/g, `form-${formCount}-`)
+    
+      newForm.querySelectorAll('input, textarea').forEach(function (input) {
+        if (input.type !== 'hidden') {
+          input.value = ''
+        }
+      })
+    
+      const removeButton = document.createElement('button')
+    
+      removeButton.type = 'button'
+    
+      removeButton.className = 'btn btn-danger remove-medicine'
+    
+      removeButton.textContent = 'Remove'
+    
+      newForm.appendChild(removeButton)
+    
+      medicineContainer.appendChild(newForm)
+    
+      totalForms.value = formCount + 1
+    })
+    
+    medicineContainer.addEventListener('click', function (event) {
+      if (event.target.classList.contains('remove-medicine')) {
+        event.target.closest('.medicine-form').remove()
+      }
+    })
+  </script>
+{% endblock %}

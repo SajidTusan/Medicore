@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>My Prescriptions</h1>
+        <p>View your medical prescriptions and medicines.</p>
+    </div>
+
+    {% if prescriptions %}
+
+        {% for prescription in prescriptions %}
+
+            <div class="card" style="margin-bottom: 20px;">
+
+                <div class="card-body">
+
+                    <div>
+                        <h2>
+                            {{ prescription.prescription_id }}
+                        </h2>
+
+                        <p>
+                            <strong>Date:</strong>
+                            {{ prescription.created_at|date:"d M Y" }}
+                        </p>
+
+                        <p>
+                            <strong>Doctor:</strong>
+                            Dr. {{ prescription.doctor.get_full_name }}
+                        </p>
+                    </div>
+
+                    <hr>
+
+                    <h3>Medicines</h3>
+
+                    <ul>
+
+                        {% for medicine in prescription.medicines.all %}
+
+                            <li style="margin-bottom: 8px;">
+
+                                <strong>
+                                    {{ medicine.medicine_name }}
+                                </strong>
+
+                                - {{ medicine.dosage }}
+                                - {{ medicine.frequency }}
+                                - {{ medicine.duration }}
+
+                            </li>
+
+                        {% empty %}
+
+                            <li>No medicines prescribed.</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                    {% if prescription.advice %}
+
+                        <p style="margin-top: 16px;">
+                            <strong>Advice:</strong>
+                            {{ prescription.advice }}
+                        </p>
+
+                    {% endif %}
+
+                    <div style="margin-top: 16px;">
+
+                        <a
+                            href="{% url 'medical_records:prescription_detail' prescription.id %}"
+                            class="btn btn-primary"
+                        >
+                            View Full Prescription
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h2>No Prescriptions</h2>
+
+                <p>
+                    You don't have any prescriptions yet.
+                </p>
+
+                <a
+                    href="{% url 'patients:appointments' %}"
+                    class="btn btn-primary"
+                >
+                    My Appointments
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

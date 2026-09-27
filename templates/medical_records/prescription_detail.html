@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+
+        <h1>Prescription</h1>
+
+        <p>
+            Prescription ID:
+            <strong>
+                {{ prescription.prescription_id }}
+            </strong>
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h2>
+                Patient
+            </h2>
+
+            <p>
+                Name:
+                <strong>
+                    {{ prescription.patient.get_full_name }}
+                </strong>
+            </p>
+
+            <p>
+                Patient ID:
+                <strong>
+                    {{ prescription.patient.public_id }}
+                </strong>
+            </p>
+
+
+            <hr>
+
+
+            <h2>
+                Doctor
+            </h2>
+
+            <p>
+                Dr. {{ prescription.doctor.get_full_name }}
+            </p>
+
+
+            <hr>
+
+
+            <h2>
+                Medicines
+            </h2>
+
+            {% for medicine in prescription.medicines.all %}
+
+                <div
+                    class="card"
+                    style="margin-top: 16px;"
+                >
+
+                    <div class="card-body">
+
+                        <h3>
+                            {{ medicine.medicine_name }}
+                        </h3>
+
+                        <p>
+                            <strong>Dosage:</strong>
+                            {{ medicine.dosage }}
+                        </p>
+
+                        <p>
+                            <strong>Frequency:</strong>
+                            {{ medicine.frequency }}
+                        </p>
+
+                        <p>
+                            <strong>Duration:</strong>
+                            {{ medicine.duration }}
+                        </p>
+
+                        {% if medicine.instructions %}
+
+                            <p>
+                                <strong>Instructions:</strong>
+                                {{ medicine.instructions }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <p>
+                    No medicines prescribed.
+                </p>
+
+            {% endfor %}
+
+
+            {% if prescription.advice %}
+
+                <hr>
+
+                <h2>
+                    General Advice
+                </h2>
+
+                <p>
+                    {{ prescription.advice }}
+                </p>
+
+            {% endif %}
+
+
+            {% if prescription.tests_advised %}
+
+                <hr>
+
+                <h2>
+                    Tests Advised
+                </h2>
+
+                <p>
+                    {{ prescription.tests_advised }}
+                </p>
+
+            {% endif %}
+
+
+            {% if prescription.follow_up_date %}
+
+                <hr>
+
+                <h2>
+                    Follow-up
+                </h2>
+
+                <p>
+                    {{ prescription.follow_up_date|date:"d M Y" }}
+                </p>
+
+            {% endif %}
+
+
+            <hr>
+
+            <p>
+                Created:
+                {{ prescription.created_at|date:"d M Y, g:i A" }}
+            </p>
+
+
+            <div style="margin-top: 24px;">
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="window.print()"
+                >
+                    Print Prescription
+                </button>
+
+                <a
+                    href="{% url 'medical_records:consultation_detail' prescription.consultation.id %}"
+                    class="btn btn-secondary"
+                >
+                    Back to Consultation
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

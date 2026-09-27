@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>My Schedule</h1>
+
+        <p class="text-muted">
+            Manage your hospital duties and availability.
+        </p>
+    </div>
+
+    <div>
+        <a
+            href="{% url 'schedule_manager:create' %}"
+            class="btn btn-primary"
+        >
+            + Add Schedule
+        </a>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    {% if schedules %}
+
+        <div class="table-responsive">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Hospital</th>
+                        <th>Department</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for schedule in schedules %}
+
+                        <tr>
+
+                            <td>
+                                {{ schedule.date }}
+                            </td>
+
+                            <td>
+                                {{ schedule.start_time }}
+                                -
+                                {{ schedule.end_time }}
+                            </td>
+
+                            <td>
+
+                                {% if schedule.schedule_type == "HOSPITAL_DUTY" %}
+
+                                    <span class="badge badge-success">
+                                        Hospital Duty
+                                    </span>
+
+                                {% elif schedule.schedule_type == "HOME_CARE" %}
+
+                                    <span class="badge badge-warning">
+                                        Home Care
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge badge-danger">
+                                        Leave
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if schedule.hospital %}
+                                    {{ schedule.hospital.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if schedule.department %}
+                                    {{ schedule.department.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <a
+                                    href="{% url 'schedule_manager:edit' schedule.id %}"
+                                    class="btn btn-secondary"
+                                >
+                                    Edit
+                                </a>
+
+                                <a
+                                    href="{% url 'schedule_manager:delete' schedule.id %}"
+                                    class="btn btn-danger"
+                                >
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No schedules yet</h3>
+
+            <p>
+                Create your first schedule to manage your availability.
+            </p>
+
+            <a
+                href="{% url 'schedule_manager:create' %}"
+                class="btn btn-primary"
+            >
+                Create Schedule
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
