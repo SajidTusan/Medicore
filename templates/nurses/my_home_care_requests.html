@@ -1,54 +1,39 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
+  <h1>My Home-Care Requests</h1>
 
-<h1>My Home-Care Requests</h1>
+  {% for request in requests %}
+    <div>
+      <h3>{{ request.nurse.user.get_full_name }}</h3>
 
-{% for request in requests %}
+      <p>Nurse ID:
+        {{ request.nurse.user.public_id }}</p>
 
-<div>
+      <p>Date:
+        {{ request.date }}</p>
 
-    <h3>
-        {{ request.nurse.user.get_full_name }}
-    </h3>
-
-    <p>
-        Nurse ID:
-        {{ request.nurse.user.public_id }}
-    </p>
-
-    <p>
-        Date:
-        {{ request.date }}
-    </p>
-
-    <p>
-        Time:
+      <p>Time:
         {{ request.start_time }}
         -
-        {{ request.end_time }}
-    </p>
+        {{ request.end_time }}</p>
 
-    <p>
-        Location:
-        {{ request.location }}
-    </p>
+      <p>Location:
+        {{ request.location }}</p>
 
-    <p>
-        Status:
-        {{ request.get_status_display }}
-    </p>
+      <p>Status:
+        {{ request.get_status_display }}</p>
+      {% if request.status == 'COMPLETED' %}
+        {% if not request.review %}
+          <a href="{% url 'nurses:review_home_care' request.id %}">Rate Nurse</a>
+        {% else %}
+          <p>✓ Review submitted</p>
+        {% endif %}
+      {% endif %}
+    </div>
 
-</div>
-
-<hr>
-
-{% empty %}
-
-<p>
-    You have no home-care requests yet.
-</p>
-
-{% endfor %}
-
+    <hr />
+  {% empty %}
+    <p>You have no home-care requests yet.</p>
+  {% endfor %}
 {% endblock %}

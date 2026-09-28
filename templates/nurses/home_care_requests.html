@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Home-Care Requests</h1>
+
+  {% for request in requests %}
+    <div>
+      <h3>
+        Patient:
+        {{ request.patient.get_full_name }}
+      </h3>
+
+      <p>Patient ID:
+        {{ request.patient.public_id }}</p>
+
+      <p>Date:
+        {{ request.date }}</p>
+
+      <p>Time:
+        {{ request.start_time }}
+        -
+        {{ request.end_time }}</p>
+
+      <p>Location:
+        {{ request.location }}</p>
+
+      <p>Required Skills:
+        {{ request.required_skills|default:'Not specified' }}</p>
+
+      <p>Patient Notes:
+        {{ request.patient_notes|default:'-' }}</p>
+
+      <p>
+        Status:
+        <strong>{{ request.get_status_display }}</strong>
+      </p>
+
+      {% if request.status == 'PENDING' %}
+        <form method="post" action="{% url 'nurses:update_home_care_request' request.id %}">
+          {% csrf_token %}
+
+          <button type="submit" name="action" value="accept">Accept</button>
+
+          <button type="submit" name="action" value="reject">Reject</button>
+          {% if request.status == 'ACCEPTED' %}
+            <form method="post" action="{% url 'nurses:start_home_care_service' request.id %}">
+              {% csrf_token %}
+
+              <button type="submit">Start Service</button>
+            </form>
+          {% elif request.status == 'ACTIVE' %}
+            <form method="post" action="{% url 'nurses:complete_home_care_service' request.id %}">
+              {% csrf_token %}
+
+              <button type="submit">Complete Service</button>
+            </form>
+          {% elif request.status == 'COMPLETED' %}
+            <p>✓ Service completed</p>
+          {% elif request.status == 'REJECTED' %}
+            <p>✕ Request rejected</p>
+          {% endif %}
+        </form>
+      {% endif %}
+    </div>
+
+    <hr />
+  {% empty %}
+    <p>No home-care requests found.</p>
+  {% endfor %}
+{% endblock %}

@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import HomeCareRequest
-
+from .models import HomeCareRequest, HomeCareReview
 
 class HomeCareRequestForm(forms.ModelForm):
 
@@ -67,3 +67,39 @@ class HomeCareRequestForm(forms.ModelForm):
                 )
 
         return cleaned_data
+class HomeCareReviewForm(forms.ModelForm):
+
+    class Meta:
+        model = HomeCareReview
+
+        fields = [
+            "rating",
+            "comment",
+        ]
+
+        widgets = {
+            "rating": forms.NumberInput(
+                attrs={
+                    "min": "1",
+                    "max": "5",
+                    "step": "1",
+                }
+            ),
+            "comment": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "placeholder": "Share your experience...",
+                }
+            ),
+        }
+
+    def clean_rating(self):
+
+        rating = self.cleaned_data["rating"]
+
+        if rating < 1 or rating > 5:
+            raise forms.ValidationError(
+                "Rating must be between 1 and 5."
+            )
+
+        return rating

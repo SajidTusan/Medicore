@@ -32,4 +32,34 @@ path(
     name="my_home_care_requests",
 ),
 
+path(
+    "home-care/requests/",
+    views.nurse_home_care_requests,
+    name="nurse_home_care_requests",
+),
+
+path(
+    "home-care/requests/<int:request_id>/update/",
+    views.update_home_care_request,
+    name="update_home_care_request",
+),
+
+path(
+    "home-care/requests/<int:request_id>/start/",
+    views.start_home_care_service,
+    name="start_home_care_service",
+),
+
+path(
+    "home-care/requests/<int:request_id>/complete/",
+    views.complete_home_care_service,
+    name="complete_home_care_service",
+),
+
+path(
+    "home-care/requests/<int:request_id>/review/",
+    views.review_home_care,
+    name="review_home_care",
+),
+
 ]

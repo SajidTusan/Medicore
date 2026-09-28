@@ -173,3 +173,39 @@ class HomeCareRequest(models.Model):
             f"{self.nurse.user.public_id} - "
             f"{self.date}"
         )
+
+class HomeCareReview(models.Model):
+
+    request = models.OneToOneField(
+        HomeCareRequest,
+        on_delete=models.CASCADE,
+        related_name="review",
+    )
+
+    patient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="home_care_reviews",
+    )
+
+    nurse = models.ForeignKey(
+        NurseProfile,
+        on_delete=models.PROTECT,
+        related_name="home_care_reviews",
+    )
+
+    rating = models.PositiveSmallIntegerField()
+
+    comment = models.TextField(
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    def __str__(self):
+        return (
+            f"{self.nurse.user.public_id} - "
+            f"{self.rating}/5"
+        )
