@@ -1,24 +1,21 @@
 from django.contrib import admin
-
 from .models import NurseProfile
-
 
 @admin.register(NurseProfile)
 class NurseProfileAdmin(admin.ModelAdmin):
-
     list_display = (
         "user",
         "hospital",
-        "department",
+        "get_department",          
         "qualification",
         "experience_years",
-        "is_available_for_homecare",
+        "check_homecare_status",     
     )
 
     list_filter = (
         "hospital",
-        "department",
-        "is_available_for_homecare",
+        "qualification",
+        "experience_years",
     )
 
     search_fields = (
@@ -28,3 +25,13 @@ class NurseProfileAdmin(admin.ModelAdmin):
         "user__public_id",
         "phone",
     )
+
+    @admin.display(description="Department")
+    def get_department(self, obj):
+        if obj.hospital and hasattr(obj.hospital, 'department'):
+            return obj.hospital.department
+        return "N/A"
+
+    @admin.display(description="Homecare Available", boolean=True)
+    def check_homecare_status(self, obj):
+        return obj.home_care_availability.filter(is_active=True).exists()
