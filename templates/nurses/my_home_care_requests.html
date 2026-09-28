@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>My Home-Care Requests</h1>
+
+{% for request in requests %}
+
+<div>
+
+    <h3>
+        {{ request.nurse.user.get_full_name }}
+    </h3>
+
+    <p>
+        Nurse ID:
+        {{ request.nurse.user.public_id }}
+    </p>
+
+    <p>
+        Date:
+        {{ request.date }}
+    </p>
+
+    <p>
+        Time:
+        {{ request.start_time }}
+        -
+        {{ request.end_time }}
+    </p>
+
+    <p>
+        Location:
+        {{ request.location }}
+    </p>
+
+    <p>
+        Status:
+        {{ request.get_status_display }}
+    </p>
+
+</div>
+
+<hr>
+
+{% empty %}
+
+<p>
+    You have no home-care requests yet.
+</p>
+
+{% endfor %}
+
+{% endblock %}
