@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "apps.medical_records.apps.MedicalRecordsConfig",
     "apps.pharmacy.apps.PharmacyConfig",
     "apps.billing.apps.BillingConfig",
+    "apps.notifications.apps.NotificationsConfig",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Notifications</h1>
+    <p>
+        You have {{ unread_count }} unread notification{{ unread_count|pluralize }}.
+    </p>
+</div>
+
+
+<div class="card">
+
+    {% if notifications %}
+
+        {% for notification in notifications %}
+
+            <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+
+                <div>
+                    <h3>
+                        {{ notification.title }}
+                    </h3>
+
+                    <p>
+                        {{ notification.message }}
+                    </p>
+
+                    <small>
+                        {{ notification.get_notification_type_display }}
+                        ·
+                        {{ notification.created_at|date:"d M Y, h:i A" }}
+                    </small>
+                </div>
+
+
+                {% if not notification.is_read %}
+
+                    <form
+                        method="post"
+                        action="{% url 'notifications:mark_read' notification.id %}"
+                    >
+                        {% csrf_token %}
+
+                        <button type="submit">
+                            Mark as read
+                        </button>
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No notifications yet.</p>
+
+    {% endif %}
+
+
+    {% if unread_count %}
+
+        <form
+            method="post"
+            action="{% url 'notifications:mark_all_read' %}"
+        >
+            {% csrf_token %}
+
+            <button type="submit">
+                Mark all as read
+            </button>
+        </form>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
