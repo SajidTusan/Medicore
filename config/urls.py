@@ -32,4 +32,5 @@ urlpatterns = [
     path("pharmacy/",include("apps.pharmacy.urls"),),
     path("billing/",include("apps.billing.urls"),),
     path("notifications/",include("apps.notifications.urls"),),
+    path("search/",include("apps.search.urls"),),
 ]

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "apps.pharmacy.apps.PharmacyConfig",
     "apps.billing.apps.BillingConfig",
     "apps.notifications.apps.NotificationsConfig",
+    "apps.search.apps.SearchConfig",
 ]
 
 MIDDLEWARE = [
