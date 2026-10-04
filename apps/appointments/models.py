@@ -58,3 +58,24 @@ class Appointment(models.Model):
             f"Dr. {self.doctor.user.get_full_name()} - "
             f"{self.date} {self.start_time}"
         )
+
+    class Meta:
+        ordering = ["date", "start_time"]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "doctor",
+                    "date",
+                    "start_time",
+                    "end_time",
+                ],
+                condition=models.Q(
+                    status__in=[
+                        "PENDING",
+                        "CONFIRMED",
+                    ]
+                ),
+                name="unique_active_doctor_appointment_slot",
+            ),
+        ]

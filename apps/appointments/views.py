@@ -1,8 +1,10 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from urllib3 import request
+from requests import request
 
 from apps.doctors.models import DoctorProfile
 
@@ -132,18 +134,28 @@ def book_appointment(request, doctor_id):
                         },
                         status=409,
                     )
-
-                Appointment.objects.create(
-                    patient=request.user,
-                    doctor=doctor,
-                    department=doctor.department,
-                    date=appointment_date,
-                    start_time=start_time,
-                    end_time=end_time,
-                    status=Appointment.Status.PENDING,
-                    reason=form.cleaned_data["reason"],
-                    notes=form.cleaned_data["notes"],
-                )
+                try:
+                    Appointment.objects.create(
+                        patient=request.user,
+                        doctor=doctor,
+                        department=doctor.department,
+                        date=appointment_date,
+                        start_time=start_time,
+                        end_time=end_time,
+                        status=Appointment.Status.PENDING,
+                        reason=form.cleaned_data["reason"],
+                        notes=form.cleaned_data["notes"],
+                    )
+                except IntegrityError:
+                        return render(
+                            request,
+                            "appointments/slot_unavailable.html",
+                            {
+                                "doctor": doctor,
+                                "date": appointment_date,
+                            },
+                            status=409,
+                        )
 
             return redirect(
                 "patients:appointments"
