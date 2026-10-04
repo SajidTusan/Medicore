@@ -1,13 +1,34 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from urllib3 import request
 
 from apps.appointments.models import Appointment
-from .forms import (ConsultationForm,PrescriptionForm,PrescriptionMedicineFormSet,)
-from .models import (Consultation,Prescription,PrescriptionMedicine,)
-from .forms import (ConsultationForm,PrescriptionForm,PrescriptionMedicineFormSet,LabTestOrderForm,)
-from .models import (Consultation,Prescription,PrescriptionMedicine,LabTestOrder,)
+from .forms import (
+    ConsultationForm,
+    PrescriptionForm,
+    PrescriptionMedicineFormSet,
+)
+from .models import (
+    Consultation,
+    Prescription,
+    PrescriptionMedicine,
+)
+from .forms import (
+    ConsultationForm,
+    PrescriptionForm,
+    PrescriptionMedicineFormSet,
+    LabTestOrderForm,
+)
+from .models import (
+    Consultation,
+    Prescription,
+    PrescriptionMedicine,
+    LabTestOrder,
+)
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from apps.medical_records.permissions import doctor_has_patient_relationship
+
 
 @login_required
 def create_consultation(request, appointment_id):
@@ -121,6 +142,7 @@ def consultation_detail(request, consultation_id):
         },
     )
 
+
 @login_required
 def create_prescription(request, consultation_id):
 
@@ -141,13 +163,9 @@ def create_prescription(request, consultation_id):
         doctor=request.user,
     )
 
-    existing_prescription = (
-        Prescription.objects
-        .filter(
-            consultation=consultation,
-        )
-        .first()
-    )
+    existing_prescription = Prescription.objects.filter(
+        consultation=consultation,
+    ).first()
 
     if existing_prescription:
         return redirect(
@@ -157,24 +175,16 @@ def create_prescription(request, consultation_id):
 
     if request.method == "POST":
 
-        prescription_form = PrescriptionForm(
-            request.POST
-        )
+        prescription_form = PrescriptionForm(request.POST)
 
-        medicine_formset = PrescriptionMedicineFormSet(
-            request.POST
-        )
+        medicine_formset = PrescriptionMedicineFormSet(request.POST)
 
-        if (
-            prescription_form.is_valid()
-            and medicine_formset.is_valid()
-        ):
+        if prescription_form.is_valid() and medicine_formset.is_valid():
 
             valid_medicines = [
                 form.cleaned_data
                 for form in medicine_formset
-                if form.cleaned_data
-                and not form.cleaned_data.get("DELETE")
+                if form.cleaned_data and not form.cleaned_data.get("DELETE")
             ]
 
             if not valid_medicines:
@@ -189,36 +199,20 @@ def create_prescription(request, consultation_id):
                     consultation=consultation,
                     patient=consultation.patient,
                     doctor=request.user,
-                    advice=prescription_form.cleaned_data[
-                        "advice"
-                    ],
-                    tests_advised=prescription_form.cleaned_data[
-                        "tests_advised"
-                    ],
-                    follow_up_date=prescription_form.cleaned_data[
-                        "follow_up_date"
-                    ],
+                    advice=prescription_form.cleaned_data["advice"],
+                    tests_advised=prescription_form.cleaned_data["tests_advised"],
+                    follow_up_date=prescription_form.cleaned_data["follow_up_date"],
                 )
 
                 for medicine in valid_medicines:
 
                     PrescriptionMedicine.objects.create(
                         prescription=prescription,
-                        medicine_name=medicine[
-                            "medicine_name"
-                        ],
-                        dosage=medicine[
-                            "dosage"
-                        ],
-                        frequency=medicine[
-                            "frequency"
-                        ],
-                        duration=medicine[
-                            "duration"
-                        ],
-                        instructions=medicine[
-                            "instructions"
-                        ],
+                        medicine_name=medicine["medicine_name"],
+                        dosage=medicine["dosage"],
+                        frequency=medicine["frequency"],
+                        duration=medicine["duration"],
+                        instructions=medicine["instructions"],
                     )
 
                 return redirect(
@@ -242,6 +236,7 @@ def create_prescription(request, consultation_id):
         },
     )
 
+
 @login_required
 def prescription_detail(request, prescription_id):
 
@@ -250,16 +245,27 @@ def prescription_detail(request, prescription_id):
             "patient",
             "doctor",
             "consultation",
-        ).prefetch_related(
-            "medicines",
-        ),
+        ).prefetch_related("medicines"),
         id=prescription_id,
     )
 
-    if (
-        request.user != prescription.doctor
-        and request.user != prescription.patient
-    ):
+    if request.user.role == "PATIENT":
+        if prescription.patient != request.user:
+            return render(
+                request,
+                "errors/403.html",
+                status=403,
+            )
+
+    elif request.user.role == "DOCTOR":
+        if prescription.doctor != request.user:
+            return render(
+                request,
+                "errors/403.html",
+                status=403,
+            )
+
+    else:
         return render(
             request,
             "errors/403.html",
@@ -273,6 +279,7 @@ def prescription_detail(request, prescription_id):
             "prescription": prescription,
         },
     )
+
 
 @login_required
 def create_lab_order(request, consultation_id):
@@ -325,6 +332,8 @@ def create_lab_order(request, consultation_id):
             "consultation": consultation,
         },
     )
+
+
 @login_required
 def lab_orders(request):
 
@@ -335,16 +344,12 @@ def lab_orders(request):
             status=403,
         )
 
-    orders = (
-        LabTestOrder.objects
-        .select_related(
-            "patient",
-            "doctor",
-            "test",
-        )
-        .order_by(
-            "-created_at",
-        )
+    orders = LabTestOrder.objects.select_related(
+        "patient",
+        "doctor",
+        "test",
+    ).order_by(
+        "-created_at",
     )
 
     return render(
@@ -354,6 +359,7 @@ def lab_orders(request):
             "orders": orders,
         },
     )
+
 
 @login_required
 def update_lab_order(request, order_id):
@@ -376,9 +382,7 @@ def update_lab_order(request, order_id):
 
     if request.method == "POST":
 
-        form = LabOrderUpdateForm(
-            request.POST
-        )
+        form = LabOrderUpdateForm(request.POST)
 
         if form.is_valid():
 
@@ -386,17 +390,12 @@ def update_lab_order(request, order_id):
             order.result = form.cleaned_data["result"]
             order.notes = form.cleaned_data["notes"]
 
-            if (
-                order.status
-                == LabTestOrder.Status.COMPLETED
-            ):
+            if order.status == LabTestOrder.Status.COMPLETED:
                 order.result_date = timezone.now()
 
             order.save()
 
-            return redirect(
-                "medical_records:lab_orders"
-            )
+            return redirect("medical_records:lab_orders")
 
     else:
 
@@ -416,7 +415,10 @@ def update_lab_order(request, order_id):
             "order": order,
         },
     )
+
+
 User = get_user_model()
+
 
 @login_required
 def doctor_patient_lab_reports(request, patient_id):
@@ -436,9 +438,18 @@ def doctor_patient_lab_reports(request, patient_id):
         role="PATIENT",
     )
 
+
+    if not doctor_has_patient_relationship(
+    request.user,
+    patient,
+    ):
+        return render(
+        request,
+        "errors/403.html",
+        status=403,
+    )
     reports = (
-        LabTestOrder.objects
-        .filter(
+        LabTestOrder.objects.filter(
             patient=patient,
         )
         .select_related(

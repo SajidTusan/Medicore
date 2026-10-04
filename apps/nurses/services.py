@@ -29,15 +29,29 @@ def is_nurse_available(
         return False, "Nurse is not available during this time."
 
     hospital_conflict = Schedule.objects.filter(
-        user=nurse.user,
-        date=date,
-        is_active=True,
-        start_time__lt=end_time,
-        end_time__gt=start_time,
-    ).exists()
+    user=nurse.user,
+    date=date,
+    is_active=True,
+    schedule_type=Schedule.ScheduleType.HOSPITAL_DUTY,
+    start_time__lt=end_time,
+    end_time__gt=start_time,
+        ).exists()
 
     if hospital_conflict:
         return False, "This time conflicts with the nurse's hospital duty."
+
+
+    leave_conflict = Schedule.objects.filter(
+    user=nurse.user,
+    date=date,
+    is_active=True,
+    schedule_type=Schedule.ScheduleType.LEAVE,
+    start_time__lt=end_time,
+    end_time__gt=start_time,
+    ).exists()
+
+    if leave_conflict:
+        return False, "Nurse is on leave during this time."
 
     existing_requests = HomeCareRequest.objects.filter(
         nurse=nurse,
