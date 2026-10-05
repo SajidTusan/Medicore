@@ -5,6 +5,7 @@ from urllib3 import request
 from apps.appointments.models import Appointment
 from .forms import (
     ConsultationForm,
+    LabOrderUpdateForm,
     PrescriptionForm,
     PrescriptionMedicineFormSet,
 )

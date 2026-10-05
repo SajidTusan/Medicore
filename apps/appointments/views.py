@@ -1,11 +1,9 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
-from urllib3 import request
-from requests import request
-
 from apps.doctors.models import DoctorProfile
 
 from .forms import AppointmentBookingForm
@@ -15,6 +13,13 @@ from .services import get_available_slots
 
 @login_required
 def book_appointment(request, doctor_id):
+
+    if request.user.role != "PATIENT":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
 
     doctor = get_object_or_404(
         DoctorProfile.objects.select_related(
@@ -82,7 +87,22 @@ def book_appointment(request, doctor_id):
                 "errors/400.html",
                 status=400,
             )
-
+        if start_time >= end_time:
+            return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
+        if appointment_date < timezone.localdate():
+            return render(
+            request,
+            "appointments/slot_unavailable.html",
+            {
+                "doctor": doctor,
+                "date": appointment_date,
+            },
+            status=409,
+        )
     available_slots = get_available_slots(
         doctor=doctor,
         date=appointment_date,
