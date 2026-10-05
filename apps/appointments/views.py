@@ -196,3 +196,47 @@ def book_appointment(request, doctor_id):
             "form": form,
         },
     )
+@login_required
+def cancel_appointment(request, appointment_id):
+
+    if request.user.role != "PATIENT":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    if request.method != "POST":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    appointment = get_object_or_404(
+        Appointment,
+        id=appointment_id,
+        patient=request.user,
+    )
+
+    if appointment.status not in [
+        Appointment.Status.PENDING,
+        Appointment.Status.CONFIRMED,
+    ]:
+        return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
+
+    appointment.status = Appointment.Status.CANCELLED
+    appointment.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
+
+    return redirect(
+        "patients:appointments"
+    )

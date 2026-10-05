@@ -12,4 +12,9 @@ urlpatterns = [
         views.book_appointment,
         name="book",
     ),
+    path(
+    "<int:appointment_id>/cancel/",
+    views.cancel_appointment,
+    name="cancel",
+),
 ]

@@ -54,6 +54,19 @@
                                 <strong>Status:</strong>
                                 {{ appointment.get_status_display }}
                             </p>
+
+                            {% if appointment.status == "PENDING" or appointment.status == "CONFIRMED" %}
+                                <form
+                                    method="post"
+                                    action="{% url 'appointments:cancel' appointment.id %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <button type="submit">
+                                        Cancel Appointment
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
 
                     </div>
