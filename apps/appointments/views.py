@@ -89,28 +89,27 @@ def book_appointment(request, doctor_id):
             )
         if start_time >= end_time:
             return render(
-            request,
-            "errors/400.html",
-            status=400,
-        )
+                request,
+                "errors/400.html",
+                status=400,
+            )
         if appointment_date < timezone.localdate():
             return render(
-            request,
-            "appointments/slot_unavailable.html",
-            {
-                "doctor": doctor,
-                "date": appointment_date,
-            },
-            status=409,
-        )
+                request,
+                "appointments/slot_unavailable.html",
+                {
+                    "doctor": doctor,
+                    "date": appointment_date,
+                },
+                status=409,
+            )
     available_slots = get_available_slots(
         doctor=doctor,
         date=appointment_date,
     )
 
     selected_slot_exists = any(
-        slot["start_time"] == start_time
-        and slot["end_time"] == end_time
+        slot["start_time"] == start_time and slot["end_time"] == end_time
         for slot in available_slots
     )
 
@@ -167,19 +166,17 @@ def book_appointment(request, doctor_id):
                         notes=form.cleaned_data["notes"],
                     )
                 except IntegrityError:
-                        return render(
-                            request,
-                            "appointments/slot_unavailable.html",
-                            {
-                                "doctor": doctor,
-                                "date": appointment_date,
-                            },
-                            status=409,
-                        )
+                    return render(
+                        request,
+                        "appointments/slot_unavailable.html",
+                        {
+                            "doctor": doctor,
+                            "date": appointment_date,
+                        },
+                        status=409,
+                    )
 
-            return redirect(
-                "patients:appointments"
-            )
+            return redirect("patients:appointments")
 
     else:
 
@@ -196,6 +193,8 @@ def book_appointment(request, doctor_id):
             "form": form,
         },
     )
+
+
 @login_required
 def cancel_appointment(request, appointment_id):
 
@@ -237,6 +236,160 @@ def cancel_appointment(request, appointment_id):
         ]
     )
 
+    return redirect("patients:appointments")
+@login_required
+def confirm_appointment(request, appointment_id):
+
+    if request.user.role != "DOCTOR":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    if request.method != "POST":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    appointment = get_object_or_404(
+        Appointment,
+        id=appointment_id,
+        doctor__user=request.user,
+    )
+
+    if appointment.status != Appointment.Status.PENDING:
+        return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
+
+    appointment.status = Appointment.Status.CONFIRMED
+    appointment.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
+
     return redirect(
-        "patients:appointments"
+        "appointments:doctor_appointments"
+    )
+@login_required
+def complete_appointment(request, appointment_id):
+
+    if request.user.role != "DOCTOR":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    if request.method != "POST":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    appointment = get_object_or_404(
+        Appointment,
+        id=appointment_id,
+        doctor__user=request.user,
+    )
+
+    if appointment.status != Appointment.Status.CONFIRMED:
+        return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
+
+    appointment.status = Appointment.Status.COMPLETED
+    appointment.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
+
+    return redirect(
+        "appointments:doctor_appointments"
+    )
+@login_required
+def mark_no_show(request, appointment_id):
+
+    if request.user.role != "DOCTOR":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    if request.method != "POST":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    appointment = get_object_or_404(
+        Appointment,
+        id=appointment_id,
+        doctor__user=request.user,
+    )
+
+    if appointment.status != Appointment.Status.CONFIRMED:
+        return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
+
+    appointment.status = Appointment.Status.NO_SHOW
+    appointment.save(
+        update_fields=[
+            "status",
+            "updated_at",
+        ]
+    )
+
+    return redirect(
+        "appointments:doctor_appointments"
+    )
+@login_required
+def doctor_appointments(request):
+
+    if request.user.role != "DOCTOR":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    appointments = (
+        Appointment.objects
+        .filter(
+            doctor__user=request.user,
+        )
+        .select_related(
+            "patient",
+            "doctor",
+            "department",
+        )
+        .order_by(
+            "date",
+            "start_time",
+        )
+    )
+
+    return render(
+        request,
+        "appointments/doctor_appointments.html",
+        {
+            "appointments": appointments,
+        },
     )

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>My Appointments</h1>
+
+{% if appointments %}
+
+    {% for appointment in appointments %}
+
+        <div>
+            <h3>
+                {{ appointment.patient.get_full_name }}
+            </h3>
+
+            <p>
+                Patient ID:
+                {{ appointment.patient.public_id }}
+            </p>
+
+            <p>
+                Date:
+                {{ appointment.date }}
+            </p>
+
+            <p>
+                Time:
+                {{ appointment.start_time }}
+                -
+                {{ appointment.end_time }}
+            </p>
+
+            <p>
+                Department:
+                {{ appointment.department.name }}
+            </p>
+
+            <p>
+                Status:
+                {{ appointment.get_status_display }}
+            </p>
+
+            {% if appointment.status == "PENDING" %}
+
+                <form
+                    method="post"
+                    action="{% url 'appointments:confirm_appointment' appointment.id %}"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Confirm
+                    </button>
+                </form>
+
+            {% elif appointment.status == "CONFIRMED" %}
+
+                <form
+                    method="post"
+                    action="{% url 'appointments:complete_appointment' appointment.id %}"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Complete
+                    </button>
+                </form>
+
+                <form
+                    method="post"
+                    action="{% url 'appointments:mark_no_show' appointment.id %}"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Mark No Show
+                    </button>
+                </form>
+
+            {% endif %}
+
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No appointments found.</p>
+
+{% endif %}
+
+{% endblock %}
