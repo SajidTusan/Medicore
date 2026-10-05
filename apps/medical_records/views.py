@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from urllib3 import request
 
@@ -42,14 +43,14 @@ def create_consultation(request, appointment_id):
         )
 
     appointment = get_object_or_404(
-        Appointment.objects.select_related(
-            "patient",
-            "doctor__user",
-            "department",
-        ),
-        id=appointment_id,
-        doctor__user=request.user,
-    )
+    Appointment.objects.select_for_update().select_related(
+        "patient",
+        "doctor__user",
+        "department",
+    ),
+    id=appointment_id,
+    doctor__user=request.user,
+)
 
     if appointment.status != Appointment.Status.CONFIRMED:
         return render(
@@ -70,20 +71,46 @@ def create_consultation(request, appointment_id):
 
         form = ConsultationForm(request.POST)
 
-        if form.is_valid():
+    if form.is_valid():
+
+        with transaction.atomic():
+
+            locked_appointment = get_object_or_404(
+                Appointment.objects.select_for_update(),
+                id=appointment.id,
+                doctor__user=request.user,
+            )
+
+            if locked_appointment.status != Appointment.Status.CONFIRMED:
+                return render(
+                    request,
+                    "errors/400.html",
+                    status=400,
+                )
+
+            existing_consultation = (
+                Consultation.objects
+                .filter(appointment=locked_appointment)
+                .first()
+            )
+
+            if existing_consultation:
+                return redirect(
+                    "medical_records:consultation_detail",
+                    consultation_id=existing_consultation.id,
+                )
 
             consultation = form.save(commit=False)
-
-            consultation.appointment = appointment
-            consultation.patient = appointment.patient
+            consultation.appointment = locked_appointment
+            consultation.patient = locked_appointment.patient
             consultation.doctor = request.user
 
             consultation.save()
 
-            return redirect(
-                "medical_records:consultation_detail",
-                consultation_id=consultation.id,
-            )
+        return redirect(
+            "medical_records:consultation_detail",
+            consultation_id=consultation.id,
+        )
 
     else:
 
