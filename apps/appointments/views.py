@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from apps.doctors.models import DoctorProfile
-
+from apps.medical_records.models import Consultation
 from .forms import AppointmentBookingForm
 from .models import Appointment
 from .services import get_available_slots
@@ -307,7 +307,23 @@ def complete_appointment(request, appointment_id):
             "errors/400.html",
             status=400,
         )
-
+    if appointment.status != Appointment.Status.CONFIRMED:
+        return render(
+        request,
+        "errors/400.html",
+        status=400,
+    )
+    consultation_exists = Consultation.objects.filter(
+    appointment=appointment,
+    ).exists()
+    
+    if not consultation_exists:
+        return render(
+        request,
+        "errors/400.html",
+        status=400,
+    )
+    
     appointment.status = Appointment.Status.COMPLETED
     appointment.save(
         update_fields=[
