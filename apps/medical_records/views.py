@@ -130,11 +130,20 @@ def consultation_detail(request, consultation_id):
         Consultation.objects.select_related(
             "patient",
             "doctor",
-            "appointment",
+            "appointment_doctor__user",
         ),
         id=consultation_id,
     )
-
+    if (
+    consultation.appointment.doctor.user != consultation.doctor
+    or consultation.appointment.patient != consultation.patient
+    ):
+        return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
+        
     if (
         request.user != consultation.doctor
         and request.user != consultation.patient
