@@ -1,5 +1,5 @@
 from django import forms
-
+from django.utils import timezone
 from .models import HomeCareRequest, HomeCareReview
 
 
@@ -60,19 +60,25 @@ class HomeCareRequestForm(forms.ModelForm):
             ),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
+        def clean(self):
+            cleaned_data = super().clean()
 
-        start_time = cleaned_data.get("start_time")
-        end_time = cleaned_data.get("end_time")
+            date = cleaned_data.get("date")
+            start_time = cleaned_data.get("start_time")
+            end_time = cleaned_data.get("end_time")
 
-        if start_time and end_time:
-            if start_time >= end_time:
+            if date and date < timezone.localdate():
                 raise forms.ValidationError(
-                    "End time must be later than start time."
+                    "Home-care date cannot be in the past."
                 )
 
-        return cleaned_data
+            if start_time and end_time:
+                if start_time >= end_time:
+                    raise forms.ValidationError(
+                        "End time must be later than start time."
+                    )
+
+            return cleaned_data
 
 
 class HomeCareReviewForm(forms.ModelForm):

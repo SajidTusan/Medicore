@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from apps.hospitals.models import Hospital
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class NurseProfile(models.Model):
@@ -194,7 +195,12 @@ class HomeCareReview(models.Model):
         related_name="home_care_reviews",
     )
 
-    rating = models.PositiveSmallIntegerField()
+    rating = models.PositiveSmallIntegerField(
+    validators=[
+        MinValueValidator(1),
+        MaxValueValidator(5),
+    ],
+    )
 
     comment = models.TextField(
         blank=True,

@@ -61,10 +61,6 @@ def nurse_profile(request):
     )
 
 
-# =========================================================
-# PATIENT - REQUEST HOME CARE
-# =========================================================
-
 @login_required
 def request_home_care(request, nurse_id):
 
@@ -154,10 +150,6 @@ def request_home_care(request, nurse_id):
     )
 
 
-# =========================================================
-# PATIENT - MY REQUESTS
-# =========================================================
-
 @login_required
 def my_home_care_requests(request):
 
@@ -187,10 +179,6 @@ def my_home_care_requests(request):
         },
     )
 
-
-# =========================================================
-# NURSE - RECEIVED REQUESTS
-# =========================================================
 
 @login_required
 def nurse_requests(request):
@@ -225,10 +213,6 @@ def nurse_requests(request):
         },
     )
 
-
-# =========================================================
-# NURSE - ACCEPT REQUEST
-# =========================================================
 
 @login_required
 def accept_home_care_request(request, request_id):
@@ -323,10 +307,6 @@ def accept_home_care_request(request, request_id):
     )
 
 
-# =========================================================
-# NURSE - REJECT REQUEST
-# =========================================================
-
 @login_required
 def reject_home_care_request(request, request_id):
 
@@ -399,10 +379,6 @@ def reject_home_care_request(request, request_id):
     )
 
 
-# =========================================================
-# NURSE - START SERVICE
-# =========================================================
-
 @login_required
 def start_home_care_request(request, request_id):
 
@@ -470,10 +446,6 @@ def start_home_care_request(request, request_id):
         "nurses:nurse_requests"
     )
 
-
-# =========================================================
-# NURSE - COMPLETE SERVICE
-# =========================================================
 
 @login_required
 def complete_home_care_request(request, request_id):
@@ -543,10 +515,6 @@ def complete_home_care_request(request, request_id):
     )
 
 
-# =========================================================
-# PATIENT - CANCEL REQUEST
-# =========================================================
-
 @login_required
 def cancel_home_care_request(request, request_id):
 
@@ -613,10 +581,6 @@ def cancel_home_care_request(request, request_id):
         "nurses:my_home_care_requests"
     )
 
-
-# =========================================================
-# PATIENT - REVIEW SERVICE
-# =========================================================
 
 @login_required
 def create_home_care_review(request, request_id):
