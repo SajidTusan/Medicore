@@ -540,3 +540,72 @@ def doctor_patient_lab_reports(request, patient_id):
             "reports": reports,
         },
     )
+
+@login_required
+def doctor_patient_medical_history(request, patient_id):
+
+    if request.user.role != "DOCTOR":
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    patient = get_object_or_404(
+        User,
+        id=patient_id,
+        role="PATIENT",
+    )
+
+    if not doctor_has_patient_relationship(
+        request.user,
+        patient,
+    ):
+        return render(
+            request,
+            "errors/403.html",
+            status=403,
+        )
+
+    consultations = (
+        Consultation.objects
+        .filter(patient=patient)
+        .select_related(
+            "doctor",
+            "appointment",
+        )
+        .order_by("-created_at")
+    )
+
+    prescriptions = (
+        Prescription.objects
+        .filter(patient=patient)
+        .select_related(
+            "doctor",
+            "consultation",
+        )
+        .prefetch_related("medicines")
+        .order_by("-created_at")
+    )
+
+    lab_reports = (
+        LabTestOrder.objects
+        .filter(patient=patient)
+        .select_related(
+            "doctor",
+            "test",
+            "consultation",
+        )
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "medical_records/doctor_patient_medical_history.html",
+        {
+            "patient": patient,
+            "consultations": consultations,
+            "prescriptions": prescriptions,
+            "lab_reports": lab_reports,
+        },
+    )

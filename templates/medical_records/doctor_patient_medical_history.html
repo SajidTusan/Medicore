@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Patient Medical History</h1>
+
+<h2>Patient Information</h2>
+
+<p>
+    Name:
+    {{ patient.get_full_name }}
+</p>
+
+<p>
+    Patient ID:
+    {{ patient.public_id }}
+</p>
+
+<hr>
+
+<h2>Consultations</h2>
+
+{% if consultations %}
+    {% for consultation in consultations %}
+        <div>
+            <p>
+                Date:
+                {{ consultation.created_at }}
+            </p>
+
+            <p>
+                Doctor:
+                {{ consultation.doctor.get_full_name }}
+            </p>
+
+            <p>
+                Chief Complaint:
+                {{ consultation.chief_complaint }}
+            </p>
+
+            <p>
+                Diagnosis:
+                {{ consultation.diagnosis }}
+            </p>
+        </div>
+
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>No consultations found.</p>
+{% endif %}
+
+
+<h2>Prescriptions</h2>
+
+{% if prescriptions %}
+    {% for prescription in prescriptions %}
+        <div>
+            <p>
+                Prescription ID:
+                {{ prescription.prescription_id }}
+            </p>
+
+            <p>
+                Date:
+                {{ prescription.created_at }}
+            </p>
+
+            <p>
+                Doctor:
+                {{ prescription.doctor.get_full_name }}
+            </p>
+
+            <p>
+                Advice:
+                {{ prescription.advice }}
+            </p>
+
+            <h4>Medicines</h4>
+
+            {% for medicine in prescription.medicines.all %}
+                <p>
+                    {{ medicine.medicine_name }}
+                    |
+                    {{ medicine.dosage }}
+                    |
+                    {{ medicine.frequency }}
+                    |
+                    {{ medicine.duration }}
+                </p>
+            {% endfor %}
+        </div>
+
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>No prescriptions found.</p>
+{% endif %}
+
+
+<h2>Lab Reports</h2>
+
+{% if lab_reports %}
+    {% for report in lab_reports %}
+        <div>
+            <p>
+                Test:
+                {{ report.test.name }}
+            </p>
+
+            <p>
+                Status:
+                {{ report.get_status_display }}
+            </p>
+
+            <p>
+                Result:
+                {{ report.result }}
+            </p>
+
+            <p>
+                Date:
+                {{ report.created_at }}
+            </p>
+        </div>
+
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>No lab reports found.</p>
+{% endif %}
+
+{% endblock %}
