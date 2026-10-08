@@ -460,37 +460,51 @@ def update_lab_order(request, order_id):
         form = LabOrderUpdateForm(request.POST)
 
         if form.is_valid():
-            order.status = form.cleaned_data["status"]
-            order.result = form.cleaned_data["result"]
-            order.notes = form.cleaned_data["notes"]
-
-            if order.status == LabTestOrder.Status.COMPLETED:
-                order.result_date = timezone.now()
-
-            order.save()
-
-            return redirect(
-                "medical_records:lab_orders"
-            )
-
-    else:
-        form = LabOrderUpdateForm(
-            initial={
-                "status": order.status,
-                "result": order.result,
-                "notes": order.notes,
+            
+            allowed_transitions = {
+                LabTestOrder.Status.REQUESTED: [
+                LabTestOrder.Status.SAMPLE_COLLECTED,
+                LabTestOrder.Status.CANCELLED,
+                ],
+                 LabTestOrder.Status.SAMPLE_COLLECTED: [
+                    LabTestOrder.Status.PROCESSING,
+                    LabTestOrder.Status.CANCELLED,
+                ],
+                LabTestOrder.Status.PROCESSING: [
+                    LabTestOrder.Status.COMPLETED,
+                    LabTestOrder.Status.CANCELLED,
+                ],
+                LabTestOrder.Status.PROCESSING: [
+                    LabTestOrder.Status.COMPLETED,
+                    LabTestOrder.Status.CANCELLED,
+                ],
+                 LabTestOrder.Status.COMPLETED: [],
+                LabTestOrder.Status.CANCELLED: [],
             }
-        )
+            new_status = form.cleaned_data["status"]
+            
+            if new_status != order.status and new_status not in allowed_transitions.get(
+                order.status,
+                [],
+            ):
+                form.add_error(
+                    "status",
+                    "Invalid laboratory status transition.",
+                )
+                
+            else:
+                order.status = new_status
+                order.result = form.cleaned_data["result"]
+                order.notes = form.cleaned_data["notes"]
 
-    return render(
-        request,
-        "medical_records/lab_order_update.html",
-        {
-            "form": form,
-            "order": order,
-        },
-    )
+                if order.status == LabTestOrder.Status.COMPLETED:
+                    order.result_date = timezone.now()
 
+                order.save()
+
+                return redirect(
+                    "medical_records:lab_orders"
+                )    
 
 User = get_user_model()
 

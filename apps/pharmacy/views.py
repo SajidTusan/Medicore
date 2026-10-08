@@ -53,7 +53,12 @@ def dispense_prescription(request, prescription_id):
         .prefetch_related("medicines"),
         id=prescription_id,
     )
-
+    if prescription.pharmacy_status == Prescription.PharmacyStatus.DISPENSED:
+        return render(
+            request,
+            "errors/400.html",
+            status=400,
+        )
     if request.method == "POST":
         form = DispenseMedicineForm(
             request.POST,
