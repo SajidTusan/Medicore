@@ -21,7 +21,6 @@ def notification_list(request):
         },
     )
 
-
 @login_required
 def mark_notification_read(request, notification_id):
     if request.method != "POST":
@@ -41,9 +40,10 @@ def mark_notification_read(request, notification_id):
 
     return redirect("notifications:list")
 
-
 @login_required
 def mark_all_notifications_read(request):
+
+
     if request.method != "POST":
         return render(
             request,

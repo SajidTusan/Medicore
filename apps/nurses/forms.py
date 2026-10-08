@@ -1,7 +1,7 @@
 from django import forms
 
-from .models import HomeCareRequest
 from .models import HomeCareRequest, HomeCareReview
+
 
 class HomeCareRequestForm(forms.ModelForm):
 
@@ -23,28 +23,35 @@ class HomeCareRequestForm(forms.ModelForm):
                     "type": "date",
                 }
             ),
+
             "start_time": forms.TimeInput(
                 attrs={
                     "type": "time",
                 }
             ),
+
             "end_time": forms.TimeInput(
                 attrs={
                     "type": "time",
                 }
             ),
+
             "location": forms.Textarea(
                 attrs={
                     "rows": 3,
                     "placeholder": "Home-care location...",
                 }
             ),
+
             "required_skills": forms.Textarea(
                 attrs={
                     "rows": 3,
-                    "placeholder": "Example: Elderly Care, Injection, Wound Care",
+                    "placeholder": (
+                        "Example: Elderly Care, Injection, Wound Care"
+                    ),
                 }
             ),
+
             "patient_notes": forms.Textarea(
                 attrs={
                     "rows": 4,
@@ -60,13 +67,14 @@ class HomeCareRequestForm(forms.ModelForm):
         end_time = cleaned_data.get("end_time")
 
         if start_time and end_time:
-
             if start_time >= end_time:
                 raise forms.ValidationError(
                     "End time must be later than start time."
                 )
 
         return cleaned_data
+
+
 class HomeCareReviewForm(forms.ModelForm):
 
     class Meta:
@@ -80,11 +88,12 @@ class HomeCareReviewForm(forms.ModelForm):
         widgets = {
             "rating": forms.NumberInput(
                 attrs={
-                    "min": "1",
-                    "max": "5",
-                    "step": "1",
+                    "min": 1,
+                    "max": 5,
+                    "step": 1,
                 }
             ),
+
             "comment": forms.Textarea(
                 attrs={
                     "rows": 4,
@@ -94,8 +103,12 @@ class HomeCareReviewForm(forms.ModelForm):
         }
 
     def clean_rating(self):
+        rating = self.cleaned_data.get("rating")
 
-        rating = self.cleaned_data["rating"]
+        if rating is None:
+            raise forms.ValidationError(
+                "Rating is required."
+            )
 
         if rating < 1 or rating > 5:
             raise forms.ValidationError(
