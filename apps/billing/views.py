@@ -84,44 +84,55 @@ def record_payment(request, bill_id):
                 remaining = bill.total_amount - bill.paid_amount
                 amount = form.cleaned_data["amount"]
 
-                if amount > remaining:
+                if bill.status in [
+                    Bill.Status.PAID,
+                    Bill.Status.CANCELLED,
+                ]:
                     form.add_error(
-                        "amount",
-                        f"Maximum payable amount is {remaining}.",
-                    )
-                elif amount <= 0:
-                    form.add_error(
-                        "amount",
-                        "Payment amount must be greater than zero.",
+                        None,
+                        "This bill cannot receive another payment.",
                     )
                 else:
-                    payment = form.save(commit=False)
+                    remaining = bill.total_amount - bill.paid_amount
+                    amount = form.cleaned_data["amount"]
 
-                    payment.bill = bill
-                    payment.paid_by = request.user
-                    payment.save()
+                    if amount > remaining:
+                        form.add_error(
+                            "amount",
+                            f"Maximum payable amount is {remaining}.",
+                        )
+                    elif amount <= 0:
+                        form.add_error(
+                            "amount",
+                            "Payment amount must be greater than zero.",
+                        )
+                    else:
+                        payment = form.save(commit=False)
 
-                    bill.paid_amount += amount
-                    bill.update_status()
+                        payment.bill = bill
+                        payment.paid_by = request.user
+                        payment.save()
 
-                    bill.save(
-                        update_fields=[
-                            "paid_amount",
-                            "status",
-                            "updated_at",
-                        ]
-                    )
+                        bill.paid_amount += amount
+                        bill.update_status()
 
-                    messages.success(
-                        request,
-                        f"Payment of {amount} recorded successfully.",
-                    )
+                        bill.save(
+                            update_fields=[
+                                "paid_amount",
+                                "status",
+                                "updated_at",
+                            ]
+                        )
 
-                    return redirect(
-                        "billing:bill_detail",
-                        bill_id=bill.id,
-                    )
+                        messages.success(
+                            request,
+                            f"Payment of {amount} recorded successfully.",
+                        )
 
+                        return redirect(
+                            "billing:bill_detail",
+                            bill_id=bill.id,
+                        )
     else:
         form = PaymentForm()
 
