@@ -207,7 +207,7 @@ def nurse_requests(request):
 
     return render(
         request,
-        "nurses/nurse_requests.html",
+        "nurses/home_care_requests.html",
         {
             "requests": requests,
         },
@@ -625,7 +625,7 @@ def create_home_care_review(request, request_id):
                 commit=False
             )
 
-            review.home_care_request = home_request
+            review.request = home_request
             review.patient = request.user
             review.nurse = home_request.nurse
 
@@ -687,3 +687,4 @@ def create_home_care_review(request, request_id):
             "home_care_request": home_request,
         },
     )
+    

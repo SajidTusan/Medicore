@@ -303,3 +303,68 @@ a {
     }
 
 }
+
+
+:root {
+    --mc-primary: #176b87;
+    --mc-primary-dark: #104e65;
+    --mc-bg: #f4f7fb;
+    --mc-surface: #ffffff;
+    --mc-text: #172b3a;
+    --mc-muted: #64748b;
+    --mc-border: #dfe7ef;
+    --mc-success: #16805d;
+    --mc-danger: #c0394b;
+    --mc-radius: 14px;
+    --mc-shadow: 0 5px 20px rgba(24, 55, 78, 0.06);
+}
+
+body {
+    background: var(--mc-bg);
+    color: var(--mc-text);
+}
+
+.card,
+.dashboard-card,
+.content-card {
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius);
+    box-shadow: var(--mc-shadow);
+}
+
+button,
+.btn,
+input[type="submit"] {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover,
+.btn:hover,
+input[type="submit"]:hover {
+    transform: translateY(-1px);
+}
+
+input,
+select,
+textarea {
+    max-width: 100%;
+    border: 1px solid var(--mc-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+@media (max-width: 768px) {
+    .container,
+    .dashboard-container,
+    .main-content {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}

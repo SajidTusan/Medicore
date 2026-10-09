@@ -1,0 +1,205 @@
+
+{% extends "base.html" %}
+
+{% block title %}MediCore AI Assistant{% endblock %}
+{% block page_heading %}AI Healthcare Assistant{% endblock %}
+
+{% block content %}
+<div class="chat-panel">
+    <div class="chat-intro">
+        <h2>MediCore Assistant</h2>
+        <p>Find doctors and check appointment availability.</p>
+        <p>বাংলায়ও প্রশ্ন করতে পারবেন।</p>
+    </div>
+
+    <div id="chat-messages" class="chat-messages" aria-live="polite">
+        <div class="chat-bubble bot">
+            Hello! Which type of doctor are you looking for?
+            <br>
+            কোন ধরনের ডাক্তার খুঁজছেন?
+        </div>
+    </div>
+
+    <form id="chat-form">
+        {% csrf_token %}
+        <label for="chat-input">Your message</label>
+        <div class="chat-input-row">
+            <input
+                id="chat-input"
+                type="text"
+                maxlength="500"
+                placeholder="e.g. cardiologist tomorrow"
+                required
+            >
+            <button type="submit" id="chat-send">Send</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.chat-panel {
+    max-width: 850px;
+    margin: 0 auto;
+    background: var(--mc-surface, #fff);
+    border: 1px solid var(--mc-border, #dfe7ef);
+    border-radius: 16px;
+    padding: 24px;
+}
+.chat-intro { margin-bottom: 20px; }
+.chat-intro p { color: var(--mc-muted, #64748b); }
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 260px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 16px 0;
+}
+.chat-bubble {
+    max-width: 90%;
+    border-radius: 12px;
+    padding: 12px 15px;
+    overflow-wrap: anywhere;
+}
+.chat-bubble.bot {
+    align-self: flex-start;
+    background: #eef5f8;
+    color: #172b3a;
+}
+.chat-bubble.user {
+    align-self: flex-end;
+    background: #176b87;
+    color: white;
+}
+.chat-input-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+.chat-input-row input { flex: 1; min-width: 0; }
+.chat-input-row button {
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: white;
+    background: #176b87;
+    cursor: pointer;
+}
+.doctor-result {
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid #dfe7ef;
+    border-radius: 10px;
+}
+.doctor-result a { color: #176b87; }
+@media (max-width: 600px) {
+    .chat-panel { padding: 14px; }
+    .chat-input-row { flex-wrap: wrap; }
+    .chat-input-row input { flex-basis: 100%; }
+}
+</style>
+
+<script>
+(() => {
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("chat-input");
+    const messages = document.getElementById("chat-messages");
+    const send = document.getElementById("chat-send");
+
+    function addBubble(text, type) {
+        const bubble = document.createElement("div");
+        bubble.className = `chat-bubble ${type}`;
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+        return bubble;
+    }
+
+    function addDoctorResults(doctors) {
+        doctors.forEach((doctor) => {
+            const card = document.createElement("div");
+            card.className = "doctor-result";
+
+            const title = document.createElement("strong");
+            title.textContent = doctor.name;
+            card.appendChild(title);
+
+            const details = document.createElement("p");
+            details.textContent =
+                `${doctor.specialization} · ${doctor.hospital || "Hospital not listed"} · Fee: ${doctor.fee}`;
+            card.appendChild(details);
+
+            if (doctor.date && doctor.slots.length) {
+                const label = document.createElement("p");
+                label.textContent = `Available slots for ${doctor.date}:`;
+                card.appendChild(label);
+
+                doctor.slots.forEach((slot) => {
+                    const link = document.createElement("a");
+                    link.href = slot.booking_url;
+                    link.textContent = `${slot.start}–${slot.end} · Book`;
+                    link.style.display = "block";
+                    link.style.margin = "6px 0";
+                    card.appendChild(link);
+                });
+            } else if (doctor.date) {
+                const noSlots = document.createElement("p");
+                noSlots.textContent =
+                    doctor.availability_message || "No slots found for this date.";
+                card.appendChild(noSlots);
+            }
+
+            messages.appendChild(card);
+        });
+
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const message = input.value.trim();
+        if (!message) return;
+
+        addBubble(message, "user");
+        input.value = "";
+        send.disabled = true;
+
+        const waiting = addBubble("Checking...", "bot");
+
+        try {
+            const response = await fetch("{% url 'chatbot:api' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": form.querySelector(
+                        "[name=csrfmiddlewaretoken]"
+                    ).value
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            waiting.remove();
+
+            addBubble(
+                data.reply || "Sorry, no response was returned.",
+                "bot"
+            );
+
+            if (data.doctors) addDoctorResults(data.doctors);
+        } catch (error) {
+            waiting.remove();
+            addBubble(
+                "Connection error. Please try again.",
+                "bot"
+            );
+        } finally {
+            send.disabled = false;
+            input.focus();
+        }
+    });
+})();
+</script>
+{% endblock %}

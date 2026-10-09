@@ -4,10 +4,8 @@ from .models import HomeCareRequest, HomeCareReview
 
 
 class HomeCareRequestForm(forms.ModelForm):
-
     class Meta:
         model = HomeCareRequest
-
         fields = [
             "date",
             "start_time",
@@ -16,69 +14,43 @@ class HomeCareRequestForm(forms.ModelForm):
             "required_skills",
             "patient_notes",
         ]
-
         widgets = {
-            "date": forms.DateInput(
-                attrs={
-                    "type": "date",
-                }
-            ),
-
-            "start_time": forms.TimeInput(
-                attrs={
-                    "type": "time",
-                }
-            ),
-
-            "end_time": forms.TimeInput(
-                attrs={
-                    "type": "time",
-                }
-            ),
-
-            "location": forms.Textarea(
-                attrs={
-                    "rows": 3,
-                    "placeholder": "Home-care location...",
-                }
-            ),
-
-            "required_skills": forms.Textarea(
-                attrs={
-                    "rows": 3,
-                    "placeholder": (
-                        "Example: Elderly Care, Injection, Wound Care"
-                    ),
-                }
-            ),
-
-            "patient_notes": forms.Textarea(
-                attrs={
-                    "rows": 4,
-                    "placeholder": "Additional information...",
-                }
-            ),
+            "date": forms.DateInput(attrs={"type": "date"}),
+            "start_time": forms.TimeInput(attrs={"type": "time"}),
+            "end_time": forms.TimeInput(attrs={"type": "time"}),
+            "location": forms.Textarea(attrs={
+                "rows": 3,
+                "placeholder": "Home-care location...",
+            }),
+            "required_skills": forms.Textarea(attrs={
+                "rows": 3,
+                "placeholder": "Example: Elderly Care, Injection, Wound Care",
+            }),
+            "patient_notes": forms.Textarea(attrs={
+                "rows": 4,
+                "placeholder": "Additional information...",
+            }),
         }
 
-        def clean(self):
-            cleaned_data = super().clean()
+    def clean(self):
+        cleaned_data = super().clean()
 
-            date = cleaned_data.get("date")
-            start_time = cleaned_data.get("start_time")
-            end_time = cleaned_data.get("end_time")
+        date = cleaned_data.get("date")
+        start_time = cleaned_data.get("start_time")
+        end_time = cleaned_data.get("end_time")
 
-            if date and date < timezone.localdate():
-                raise forms.ValidationError(
-                    "Home-care date cannot be in the past."
-                )
+        if date and date < timezone.localdate():
+            raise forms.ValidationError(
+                "Home-care date cannot be in the past."
+            )
 
-            if start_time and end_time:
-                if start_time >= end_time:
-                    raise forms.ValidationError(
-                        "End time must be later than start time."
-                    )
+        if start_time and end_time and start_time >= end_time:
+            raise forms.ValidationError(
+                "End time must be later than start time."
+            )
 
-            return cleaned_data
+        return cleaned_data
+
 
 
 class HomeCareReviewForm(forms.ModelForm):
