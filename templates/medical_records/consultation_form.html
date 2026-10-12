@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Patient Consultation</h1>
+
+      <p>Record consultation details for this appointment.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2>{{ appointment.patient.get_full_name }}</h2>
+
+        <p>
+          Patient ID:
+          <strong>{{ appointment.patient.public_id }}</strong>
+        </p>
+
+        <p>Appointment:
+          {{ appointment.date|date:'d M Y' }}
+          |
+          {{ appointment.start_time|time:'g:i A' }}
+          -
+          {{ appointment.end_time|time:'g:i A' }}</p>
+
+        <hr />
+        <h2>Previous Medical History</h2>
+
+        {% if previous_consultations %}
+          {% for consultation in previous_consultations %}
+            <div class="card" style="margin-top: 16px;">
+              <div class="card-body">
+                <p>
+                  <strong>Date:</strong>
+                  {{ consultation.created_at|date:'d M Y' }}
+                </p>
+
+                <p>
+                  <strong>Doctor:</strong>
+                  Dr. {{ consultation.doctor.get_full_name }}
+                </p>
+
+                <hr />
+
+                <p>
+                  <strong>Chief Complaint:</strong>
+                  {{ consultation.chief_complaint }}
+                </p>
+
+                <p>
+                  <strong>Symptoms:</strong>
+                  {{ consultation.symptoms|default:'Not provided.' }}
+                </p>
+
+                <p>
+                  <strong>Diagnosis:</strong>
+                  {{ consultation.diagnosis|default:'Not provided.' }}
+                </p>
+
+                <p>
+                  <strong>Clinical Notes:</strong>
+                  {{ consultation.clinical_notes|default:'Not provided.' }}
+                </p>
+
+                {% if consultation.follow_up_date %}
+                  <p>
+                    <strong>Follow-up:</strong>
+                    {{ consultation.follow_up_date|date:'d M Y' }}
+                  </p>
+                {% endif %}
+
+                <a href="{% url 'medical_records:consultation_detail' consultation.id %}" class="btn btn-secondary">View Full Record</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No previous medical records found for this patient.</p>
+        {% endif %}
+
+        <hr style="margin: 30px 0;" />
+
+        <form method="post">
+          {% csrf_token %}
+
+          {{ form.as_p }}
+
+          <button type="submit" class="btn btn-primary">Save Consultation</button>
+
+          <a href="{% url 'doctors:appointments' %}" class="btn btn-secondary">Back</a>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

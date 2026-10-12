@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Global Search</h1>
+    <p>Search MediCore information from one place.</p>
+</div>
+
+
+<form method="get" action="{% url 'search:global' %}">
+
+    <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search doctors, patients, hospitals, medicines..."
+        autocomplete="off"
+    >
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
+
+
+{% if query %}
+
+    <div class="card">
+
+        <h2>
+            Search Results for "{{ query }}"
+        </h2>
+
+        <p>
+            {{ total_results }} result{{ total_results|pluralize }} found.
+        </p>
+
+    </div>
+
+
+    {% if results.doctors %}
+
+        <div class="card">
+
+            <h2>Doctors</h2>
+
+            {% for doctor in results.doctors %}
+
+                <div class="search-result">
+
+                    <strong>
+                        Dr. {{ doctor.user.get_full_name }}
+                    </strong>
+
+                    <p>
+                        ID: {{ doctor.user.public_id }}
+                    </p>
+
+                    <p>
+                        Specialization: {{ doctor.specialization }}
+                    </p>
+
+                    {% if doctor.hospital %}
+                        <p>
+                            Hospital: {{ doctor.hospital.name }}
+                        </p>
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results.patients %}
+
+        <div class="card">
+
+            <h2>Patients</h2>
+
+            {% for patient in results.patients %}
+
+                <div class="search-result">
+
+                    <strong>
+                        {{ patient.get_full_name }}
+                    </strong>
+
+                    <p>
+                        Patient ID: {{ patient.public_id }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results.hospitals %}
+
+        <div class="card">
+
+            <h2>Hospitals</h2>
+
+            {% for hospital in results.hospitals %}
+
+                <div class="search-result">
+
+                    <strong>
+                        {{ hospital.name }}
+                    </strong>
+
+                    <p>
+                        Code: {{ hospital.code }}
+                    </p>
+
+                    <p>
+                        {{ hospital.address }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results.departments %}
+
+        <div class="card">
+
+            <h2>Departments</h2>
+
+            {% for department in results.departments %}
+
+                <div class="search-result">
+
+                    <strong>
+                        {{ department.name }}
+                    </strong>
+
+                    <p>
+                        Code: {{ department.code }}
+                    </p>
+
+                    <p>
+                        Hospital: {{ department.hospital.name }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results.medicines %}
+
+        <div class="card">
+
+            <h2>Medicines</h2>
+
+            {% for medicine in results.medicines %}
+
+                <div class="search-result">
+
+                    <strong>
+                        {{ medicine.name }}
+                    </strong>
+
+                    <p>
+                        Generic: {{ medicine.generic_name|default:"-" }}
+                    </p>
+
+                    <p>
+                        Strength: {{ medicine.strength|default:"-" }}
+                    </p>
+
+                    <p>
+                        Stock: {{ medicine.stock_quantity }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results.lab_tests %}
+
+        <div class="card">
+
+            <h2>Laboratory Tests</h2>
+
+            {% for test in results.lab_tests %}
+
+                <div class="search-result">
+
+                    <strong>
+                        {{ test.name }}
+                    </strong>
+
+                    <p>
+                        Code: {{ test.code }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if results.appointments %}
+
+        <div class="card">
+
+            <h2>Appointments</h2>
+
+            {% for appointment in results.appointments %}
+
+                <div class="search-result">
+
+                    <strong>
+                        {{ appointment.patient.public_id }}
+                    </strong>
+
+                    <p>
+                        Doctor:
+                        Dr. {{ appointment.doctor.user.get_full_name }}
+                    </p>
+
+                    <p>
+                        Date: {{ appointment.date }}
+                    </p>
+
+                    <p>
+                        Time:
+                        {{ appointment.start_time }}
+                        -
+                        {{ appointment.end_time }}
+                    </p>
+
+                    <p>
+                        Status:
+                        {{ appointment.get_status_display }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if total_results == 0 %}
+
+        <div class="card">
+
+            <h3>No results found.</h3>
+
+            <p>
+                Try another name, ID, department, medicine or hospital.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}

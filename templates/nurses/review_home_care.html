@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Rate Your Nurse</h1>
+
+<h3>
+    {{ request.nurse.user.get_full_name }}
+</h3>
+
+<p>
+    Nurse ID:
+    {{ request.nurse.user.public_id }}
+</p>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Submit Review
+    </button>
+
+</form>
+
+{% endblock %}

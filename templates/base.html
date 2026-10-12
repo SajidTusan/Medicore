@@ -1,0 +1,104 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5faf9" />
+    <title>{% block title %}MediCore{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/components.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages.css' %}" />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    {% if request.user.is_authenticated %}
+    <div class="app-shell">
+      <div class="sidebar-backdrop" data-sidebar-close></div>
+      <aside class="sidebar" id="app-sidebar" aria-label="Main navigation">
+        <a class="brand" href="{% url 'home' %}">
+          <span class="brand-icon" aria-hidden="true">✚</span>
+          <span class="brand-copy"><strong>MediCore</strong><small>Care, connected.</small></span>
+        </a>
+        <div class="nav-caption">WORKSPACE</div>
+        <nav class="sidebar-nav">
+          {% if request.user.role == 'PATIENT' %}
+            <a href="{% url 'patients:dashboard' %}" class="nav-item{% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.namespace == 'patients' %} active{% endif %}"><span class="nav-icon">⌂</span>Overview</a>
+            <a href="{% url 'patients:find_doctors' %}" class="nav-item{% if request.resolver_match.url_name == 'find_doctors' %} active{% endif %}"><span class="nav-icon">⌕</span>Find a doctor</a>
+            <a href="{% url 'patients:appointments' %}" class="nav-item{% if request.resolver_match.url_name == 'appointments' %} active{% endif %}"><span class="nav-icon">▦</span>Appointments</a>
+            <a href="{% url 'patients:medical_history' %}" class="nav-item{% if request.resolver_match.url_name == 'medical_history' %} active{% endif %}"><span class="nav-icon">▤</span>Medical history</a>
+            <a href="{% url 'patients:prescriptions' %}" class="nav-item{% if request.resolver_match.url_name == 'prescriptions' %} active{% endif %}"><span class="nav-icon">＋</span>Prescriptions</a>
+            <a href="{% url 'patients:lab_reports' %}" class="nav-item{% if request.resolver_match.url_name == 'lab_reports' %} active{% endif %}"><span class="nav-icon">⌁</span>Lab reports</a>
+            <a href="{% url 'patients:profile' %}" class="nav-item{% if request.resolver_match.url_name == 'profile' and request.resolver_match.namespace == 'patients' %} active{% endif %}"><span class="nav-icon">♙</span>My profile</a>
+            <a href="{% url 'nurses:my_home_care_requests' %}" class="nav-item"><span class="nav-icon">♡</span>Home care</a>
+          {% elif request.user.role == 'DOCTOR' %}
+            <a href="{% url 'doctors:dashboard' %}" class="nav-item{% if request.resolver_match.namespace == 'doctors' and request.resolver_match.url_name == 'dashboard' %} active{% endif %}"><span class="nav-icon">⌂</span>Overview</a>
+            <a href="{% url 'doctors:appointments' %}" class="nav-item"><span class="nav-icon">▦</span>Appointments</a>
+            <a href="{% url 'schedule_manager:list' %}" class="nav-item"><span class="nav-icon">◷</span>My schedule</a>
+            <a href="{% url 'doctors:profile' %}" class="nav-item"><span class="nav-icon">♙</span>My profile</a>
+          {% elif request.user.role == 'NURSE' %}
+            <a href="{% url 'nurses:dashboard' %}" class="nav-item"><span class="nav-icon">⌂</span>Overview</a>
+            <a href="{% url 'nurses:nurse_requests' %}" class="nav-item"><span class="nav-icon">♡</span>Care requests</a>
+            <a href="{% url 'schedule_manager:list' %}" class="nav-item"><span class="nav-icon">◷</span>My schedule</a>
+            <a href="{% url 'nurses:profile' %}" class="nav-item"><span class="nav-icon">♙</span>My profile</a>
+          {% elif request.user.role == 'LAB' %}
+            <a href="{% url 'medical_records:lab_orders' %}" class="nav-item active"><span class="nav-icon">⌁</span>Lab orders</a>
+          {% elif request.user.role == 'PHARMACIST' %}
+            <a href="{% url 'pharmacy:prescriptions' %}" class="nav-item active"><span class="nav-icon">＋</span>Prescriptions</a>
+          {% elif request.user.role == 'RECEPTIONIST' %}
+            <a href="{% url 'billing:bills' %}" class="nav-item active"><span class="nav-icon">▤</span>Billing</a>
+          {% elif request.user.is_superuser or request.user.role == 'ADMIN' %}
+            <a href="{% url 'admin:index' %}" class="nav-item"><span class="nav-icon">⚙</span>Administration</a>
+          {% endif %}
+          <div class="nav-caption nav-caption-spaced">YOUR CARE</div>
+          <a href="{% url 'chatbot:page' %}" class="nav-item{% if request.resolver_match.namespace == 'chatbot' %} active{% endif %}"><span class="nav-icon">✧</span>AI care assistant</a>
+          <a href="{% url 'notifications:list' %}" class="nav-item{% if request.resolver_match.namespace == 'notifications' %} active{% endif %}"><span class="nav-icon">♧</span>Notifications</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="sidebar-help-mark">✦</div>
+          <strong>Here for your health</strong>
+          <span>Your care, all in one place.</span>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-title-wrap">
+            <button type="button" class="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="app-sidebar">☰</button>
+            <div><span class="page-label">MEDICORE HEALTH PORTAL</span><h1>{% block page_heading %}Your workspace{% endblock %}</h1></div>
+          </div>
+          <div class="topbar-actions">
+            <a class="icon-button notification-link" href="{% url 'notifications:list' %}" aria-label="Notifications">♧</a>
+            <div class="user-mini">
+              <div class="avatar">{{ request.user.first_name|default:request.user.username|slice:':1'|upper }}</div>
+              <div class="user-details"><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>{{ request.user.get_role_display }}</span></div>
+            </div>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">{% csrf_token %}<button type="submit" class="logout-button">Sign out</button></form>
+          </div>
+        </header>
+    {% else %}
+    <div class="public-shell">
+      <header class="public-header">
+        <a class="brand" href="{% url 'home' %}"><span class="brand-icon" aria-hidden="true">✚</span><span class="brand-copy"><strong>MediCore</strong><small>Care, connected.</small></span></a>
+        <div class="public-actions"><a class="text-link" href="{% url 'login' %}">Sign in</a><a class="btn btn-primary" href="{% url 'signup' %}">Create account <span aria-hidden="true">→</span></a></div>
+      </header>
+    {% endif %}
+    {% if request.user.is_authenticated %}<section class="page-content">{% else %}<main class="public-content">{% endif %}
+      {% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<div class="message message-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+    {% if request.user.is_authenticated %}</section>{% else %}</main>{% endif %}
+    {% if request.user.is_authenticated %}
+      <footer class="site-footer">MediCore <span>·</span> Your health, thoughtfully connected.</footer>
+    </main>
+    </div>
+    {% else %}
+      <footer class="site-footer">MediCore <span>·</span> Your health, thoughtfully connected.</footer>
+    </div>
+    {% endif %}
+    <script src="{% static 'js/app.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

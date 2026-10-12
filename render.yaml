@@ -1,0 +1,29 @@
+databases:
+  - name: medicore-db
+    region: singapore
+    plan: free
+    databaseName: medicore
+    user: medicore
+
+services:
+  - type: web
+    name: medicore
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 60
+    healthCheckPath: /health/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medicore-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini

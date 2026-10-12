@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>Book Appointment</h1>
+        <p>Review your appointment details before continuing.</p>
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h2>
+                Dr. {{ doctor.user.get_full_name }}
+            </h2>
+
+            <p>
+                {{ doctor.specialization }}
+            </p>
+
+            {% if doctor.department %}
+                <p>
+                    Department: {{ doctor.department.name }}
+                </p>
+            {% endif %}
+
+
+            <hr>
+
+
+            <div class="appointment-summary">
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ date }}
+                </p>
+
+                <p>
+                    <strong>Time:</strong>
+                    {{ start_time }} - {{ end_time }}
+                </p>
+
+            </div>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Confirm Appointment
+                </button>
+
+                <a
+                    href="{% url 'patients:doctor_detail' doctor.id %}"
+                    class="btn btn-secondary"
+                >
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

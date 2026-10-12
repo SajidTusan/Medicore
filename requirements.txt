@@ -1,0 +1,10 @@
+asgiref>=3.12,<4
+Django>=6.1,<6.2
+dj-database-url>=2.3,<3
+gunicorn>=23,<24
+openai>=1.90,<3
+psycopg[binary]>=3.2,<4
+python-dotenv>=1.0,<2
+sqlparse>=0.6,<1
+tzdata>=2026.4
+whitenoise[brotli]>=6.9,<7

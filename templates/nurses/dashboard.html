@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Nurse overview | MediCore{% endblock %}
+{% block page_heading %}Nurse overview{% endblock %}
+{% block content %}
+<div class="page-header"><div><p class="eyebrow">CARE TEAM WORKSPACE</p><h1>Welcome back, {{ request.user.first_name|default:request.user.username }}.</h1><p>See today's duty and home-care requests.</p></div><a class="btn btn-primary" href="{% url 'schedule_manager:list' %}">Manage schedule <span aria-hidden="true">→</span></a></div>
+<div class="dashboard-grid">
+  <article class="card stat-card"><span class="stat-label">Today's duty</span><div class="stat-value">{{ today_duties.count }}</div><span class="stat-note">Scheduled shifts today</span></article>
+  <article class="card stat-card"><span class="stat-label">Care requests</span><div class="stat-value">{{ pending_requests }}</div><span class="stat-note">Waiting for your review</span></article>
+  <article class="card stat-card"><span class="stat-label">Department</span><div class="stat-value" style="font-size:16px">{% if profile and profile.department %}{{ profile.department.name }}{% else %}—{% endif %}</div><span class="stat-note">Your current assignment</span></article>
+  <article class="card stat-card"><span class="stat-label">Home care</span><div class="stat-value" style="font-size:18px">{% if profile and profile.is_available_for_homecare %}Available{% else %}Not available{% endif %}</div><span class="stat-note">Availability status</span></article>
+</div>
+<section class="card">
+  <div class="card-header"><div><h2 class="card-title">Today's duty</h2><p class="text-muted" style="margin:5px 0 0;font-size:12px">Your active shifts for today.</p></div></div>
+  {% if today_duties %}<div class="table-wrap"><table><thead><tr><th>Time</th><th>Duty</th><th>Location</th><th>Department</th></tr></thead><tbody>{% for duty in today_duties %}<tr><td>{{ duty.start_time|time:"g:i A" }} – {{ duty.end_time|time:"g:i A" }}</td><td>{{ duty.get_schedule_type_display }}</td><td>{{ duty.hospital.name|default:"Home care" }}</td><td>{{ duty.department.name|default:"—" }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><strong>No duty scheduled today</strong>Your upcoming shifts will appear in <a class="text-link" href="{% url 'schedule_manager:list' %}">My schedule</a>.</div>{% endif %}
+</section>
+<div class="quick-actions" style="margin-top:18px"><a class="btn btn-secondary" href="{% url 'nurses:profile' %}">My profile</a><a class="btn btn-secondary" href="{% url 'nurses:nurse_requests' %}">Care requests{% if pending_requests %} · {{ pending_requests }} new{% endif %}</a><a class="btn btn-secondary" href="{% url 'schedule_manager:list' %}">My schedule</a></div>
+{% endblock %}

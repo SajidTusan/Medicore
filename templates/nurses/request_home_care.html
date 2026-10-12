@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Request Home-Care Nurse</h1>
+
+<h3>
+    {{ nurse.user.get_full_name }}
+</h3>
+
+<p>
+    Nurse ID: {{ nurse.user.public_id }}
+</p>
+
+{% if nurse.hospital %}
+<p>
+    Hospital: {{ nurse.hospital.name }}
+</p>
+{% endif %}
+
+<p>
+    Experience:
+    {{ nurse.experience_years }} years
+</p>
+
+<hr>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Submit Request
+    </button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}MediCore | Connected care for every day{% endblock %}
+{% block content %}
+<div class="landing-page">
+  <section class="landing-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">A HEALTHIER WAY TO STAY CONNECTED</p>
+      <h1>Care that feels <em>closer.</em></h1>
+      <p>Find trusted doctors, manage appointments and keep your care journey organized, all in one thoughtful health portal.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="{% url 'signup' %}">Get started <span aria-hidden="true">→</span></a><a class="btn btn-secondary" href="{% url 'login' %}">Sign in to your account</a></div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-circle">
+        <div class="hero-medical-mark">+</div>
+        <div class="floating-note one"><span class="floating-note-icon">✓</span><span><strong>Care, coordinated</strong><small>One clear place for your health</small></span></div>
+        <div class="floating-note two"><span class="floating-note-icon">♡</span><span><strong>People-first support</strong><small>Here when you need us</small></span></div>
+      </div>
+    </div>
+  </section>
+  <section class="landing-features" aria-label="MediCore features">
+    <article class="feature-card"><span class="feature-icon">⌕</span><h3>Find the right care</h3><p>Browse doctors by specialty and find a care professional who fits your needs.</p></article>
+    <article class="feature-card"><span class="feature-icon">▦</span><h3>Stay on top of visits</h3><p>Request appointments and keep your upcoming care details organized.</p></article>
+    <article class="feature-card"><span class="feature-icon">✧</span><h3>Get a helping hand</h3><p>Use the care assistant for general guidance and help finding a doctor.</p></article>
+  </section>
+</div>
+{% endblock %}

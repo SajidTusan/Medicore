@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h1>Slot No Longer Available</h1>
+
+            <p>
+                Sorry, this appointment slot is no longer available.
+                Please choose another time.
+            </p>
+
+            <a
+                href="{% url 'patients:doctor_detail' doctor.id %}?date={{ date|date:'Y-m-d' }}"
+                class="btn btn-primary"
+            >
+                Choose Another Slot
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

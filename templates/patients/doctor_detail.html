@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Doctor Profile</p>
+
+      <h1>Dr. {{ doctor.user.get_full_name }}</h1>
+
+      <p class="text-muted">{{ doctor.specialization|default:'General Physician' }}</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="doctor-profile-header">
+      <div class="doctor-avatar large">{{ doctor.user.first_name|first|upper }}</div>
+
+      <div>
+        <h2>Dr. {{ doctor.user.get_full_name }}</h2>
+
+        <p>{{ doctor.specialization|default:'General Physician' }}</p>
+
+        {% if doctor.department %}
+          <p class="text-muted">{{ doctor.department.name }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="profile-info">
+      <div>
+        <strong>Qualification</strong>
+
+        <p>{{ doctor.qualification|default:'Not provided' }}</p>
+      </div>
+
+      <div>
+        <strong>Experience</strong>
+
+        <p>{{ doctor.experience_years }} years</p>
+      </div>
+
+      <div>
+        <strong>License Number</strong>
+
+        <p>{{ doctor.license_number|default:'Not provided' }}</p>
+      </div>
+
+      <div>
+        <strong>Hospital</strong>
+
+        <p>
+          {% if doctor.hospital %}
+            {{ doctor.hospital.name }}
+          {% else %}
+            Not assigned
+          {% endif %}
+        </p>
+      </div>
+
+      <div>
+        <strong>Department</strong>
+
+        <p>
+          {% if doctor.department %}
+            {{ doctor.department.name }}
+          {% else %}
+            Not assigned
+          {% endif %}
+        </p>
+      </div>
+
+      <div>
+        <strong>Consultation Fee</strong>
+
+        <p>৳{{ doctor.consultation_fee }}</p>
+      </div>
+    </div>
+
+    {% if doctor.bio %}
+      <hr />
+
+      <div>
+        <h3>About the Doctor</h3>
+
+        <p class="text-muted">{{ doctor.bio }}</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <section class="card" style="margin-top: 24px;">
+    <div class="card-header">
+      <h2>Book an Appointment</h2>
+      <p>Select a date to see available time slots.</p>
+    </div>
+
+    <div class="card-body">
+      <form method="get">
+        <div class="form-group">
+          <label for="appointment-date">Select Date</label>
+
+          <input type="date" id="appointment-date" name="date" value="{% if selected_date %}{{ selected_date|date:'Y-m-d' }}{% endif %}" min="{% now 'Y-m-d' %}" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 12px;">Check Availability</button>
+      </form>
+
+      {% if selected_date %}
+        <div style="margin-top: 24px;">
+          <h3>Available Time Slots</h3>
+
+          {% if available_slots %}
+            <div class="slot-grid">
+              {% for slot in available_slots %}
+                <a href="{% url 'appointments:book' doctor.id %}?date={{ selected_date|date:'Y-m-d' }}&start_time={{ slot.start_time|time:'H:i' }}&end_time={{ slot.end_time|time:'H:i' }}" class="btn btn-outline-primary">
+                  {{ slot.start_time|time:'g:i A' }}
+                  -
+                  {{ slot.end_time|time:'g:i A' }}
+                </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted">No available appointment slots for this date.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

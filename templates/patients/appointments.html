@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>My Appointments</h1>
+        <p>View your upcoming and previous appointments.</p>
+    </div>
+
+
+    {% if appointments %}
+
+        <div class="card">
+
+            <div class="card-body">
+
+                {% for appointment in appointments %}
+
+                    <div class="appointment-item">
+
+                        <div>
+                            <h3>
+                                Dr. {{ appointment.doctor.user.get_full_name }}
+                            </h3>
+
+                            <p>
+                                {{ appointment.doctor.specialization }}
+                            </p>
+
+                            {% if appointment.department %}
+                                <p>
+                                    {{ appointment.department.name }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+
+                        <div>
+                            <p>
+                                <strong>Date:</strong>
+                                {{ appointment.date|date:"d M Y" }}
+                            </p>
+
+                            <p>
+                                <strong>Time:</strong>
+                                {{ appointment.start_time|time:"g:i A" }}
+                                -
+                                {{ appointment.end_time|time:"g:i A" }}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+                                {{ appointment.get_status_display }}
+                            </p>
+
+                            {% if appointment.status == "PENDING" or appointment.status == "CONFIRMED" %}
+                                <form
+                                    method="post"
+                                    action="{% url 'appointments:cancel' appointment.id %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <button type="submit">
+                                        Cancel Appointment
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    {% if not forloop.last %}
+                        <hr>
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h2>No Appointments</h2>
+
+                <p>
+                    You don't have any appointments yet.
+                </p>
+
+                <a
+                    href="{% url 'patients:find_doctors' %}"
+                    class="btn btn-primary"
+                >
+                    Find a Doctor
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

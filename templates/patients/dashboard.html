@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Your health overview | MediCore{% endblock %}
+{% block page_heading %}Your health overview{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><p class="eyebrow">PATIENT PORTAL</p><h1>Good to see you, {{ request.user.first_name|default:request.user.username }}.</h1><p>Your care details, all in one place.</p></div>
+  <a class="btn btn-primary" href="{% url 'patients:find_doctors' %}">Find a doctor <span aria-hidden="true">→</span></a>
+</div>
+<div class="dashboard-grid">
+  <article class="card stat-card"><span class="stat-label">Upcoming visits</span><div class="stat-value">{{ appointment_count }}</div><span class="stat-note">Appointments ahead</span></article>
+  <article class="card stat-card"><span class="stat-label">Lab reports</span><div class="stat-value">{{ lab_report_count }}</div><span class="stat-note">Reports in your records</span></article>
+  <article class="card stat-card"><span class="stat-label">Prescriptions</span><div class="stat-value">{{ prescription_count }}</div><span class="stat-note">Prescriptions from your care team</span></article>
+  <article class="card stat-card"><span class="stat-label">Patient ID</span><div class="stat-value" style="font-size:20px">{{ request.user.public_id }}</div><span class="stat-note">Your MediCore account</span></article>
+</div>
+<section class="card">
+  <div class="card-header"><div><h2 class="card-title">Your next appointments</h2><p class="text-muted" style="margin:5px 0 0;font-size:12px">A quick look at what's coming up.</p></div><a class="text-link" href="{% url 'patients:appointments' %}">View all →</a></div>
+  {% if upcoming_appointments %}
+  <div class="table-wrap"><table><thead><tr><th>Doctor</th><th>Department</th><th>Date &amp; time</th><th>Status</th></tr></thead><tbody>
+    {% for appointment in upcoming_appointments %}<tr><td><strong>Dr. {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}</strong></td><td>{{ appointment.department.name }}</td><td>{{ appointment.date|date:"M j, Y" }} · {{ appointment.start_time|time:"g:i A" }}</td><td><span class="badge {% if appointment.status == 'CONFIRMED' %}badge-success{% else %}badge-warning{% endif %}">{{ appointment.get_status_display }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty-state"><strong>No upcoming visits yet</strong>Find a doctor to explore care options and request an appointment.<div style="margin-top:13px"><a class="btn btn-secondary btn-small" href="{% url 'patients:find_doctors' %}">Browse doctors</a></div></div>{% endif %}
+</section>
+<div class="quick-actions" style="margin-top:18px"><a class="btn btn-secondary" href="{% url 'chatbot:page' %}">✧ Ask the care assistant</a><a class="btn btn-secondary" href="{% url 'patients:medical_history' %}">View medical history</a></div>
+{% endblock %}

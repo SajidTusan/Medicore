@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Create account | MediCore{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <aside class="auth-aside">
+    <div>
+      <a class="brand" href="{% url 'home' %}"><span class="brand-icon">✚</span><span class="brand-copy"><strong>MediCore</strong><small>Care, connected.</small></span></a>
+      <h2>A little easier, every step.</h2>
+      <p>Create your patient account to find care, request appointments and keep your health information close at hand.</p>
+    </div>
+    <div class="auth-aside-foot">Private account. Personal care.</div>
+  </aside>
+  <section class="auth-form-panel">
+    <div class="auth-form-inner">
+      <p class="eyebrow">PATIENT PORTAL</p>
+      <h1>Create your account</h1>
+      <p>It only takes a moment to get started.</p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}<div class="form-group"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}{{ field.errors }}</div>{% endfor %}
+        <button class="btn btn-primary" type="submit">Create patient account <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

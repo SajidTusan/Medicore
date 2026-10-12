@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Bill {{ bill.bill_id }}</h1>
+
+<h3>Patient</h3>
+
+<p>
+    {{ bill.patient.get_full_name }}
+    <br>
+    ID: {{ bill.patient.public_id }}
+</p>
+
+<hr>
+
+<h3>Bill Summary</h3>
+
+<p>Consultation Fee: {{ bill.consultation_fee }}</p>
+<p>Lab Fee: {{ bill.lab_fee }}</p>
+<p>Medicine Fee: {{ bill.medicine_fee }}</p>
+<p>Other Fee: {{ bill.other_fee }}</p>
+
+<hr>
+
+<p>
+    <strong>Total:</strong>
+    {{ bill.total_amount }}
+</p>
+
+<p>
+    <strong>Paid:</strong>
+    {{ bill.paid_amount }}
+</p>
+
+<p>
+    <strong>Due:</strong>
+    {{ remaining }}
+</p>
+
+<p>
+    <strong>Status:</strong>
+    {{ bill.get_status_display }}
+</p>
+
+{% if request.user.role == "ADMIN" or request.user.role == "RECEPTIONIST" %}
+
+{% if bill.status != "PAID" and bill.status != "CANCELLED" %}
+
+<a href="{% url 'billing:record_payment' bill.id %}">
+    Record Payment
+</a>
+
+{% endif %}
+
+{% endif %}
+
+<hr>
+
+<h3>Payment History</h3>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Transaction ID</th>
+            <th>Recorded By</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for payment in payments %}
+
+        <tr>
+            <td>{{ payment.amount }}</td>
+            <td>{{ payment.get_method_display }}</td>
+            <td>{{ payment.transaction_id|default:"-" }}</td>
+            <td>{{ payment.paid_by.username }}</td>
+            <td>{{ payment.paid_at }}</td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+            <td colspan="5">
+                No payments recorded yet.
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

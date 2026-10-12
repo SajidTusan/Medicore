@@ -1,0 +1,302 @@
+{% extends "base.html" %} {% block title %}AI care assistant | MediCore{%
+endblock %} {% block page_heading %}AI care assistant{% endblock %} {% block
+content %}
+<div class="page-header">
+  <div>
+    <p class="eyebrow">A HELPFUL FIRST STEP</p>
+    <h1>How can we help?</h1>
+    <p>Get general health information or find a doctor and appointment slot.</p>
+  </div>
+</div>
+<div class="chat-layout">
+  <section class="chat-panel" aria-label="MediCore assistant chat">
+    <div class="chat-intro">
+      <div class="chat-brand-mark" aria-hidden="true">✧</div>
+      <div>
+        <h2>MediCore care assistant</h2>
+        <p>Here to help you find your next step.</p>
+      </div>
+      <span class="assistant-status"
+        ><i class="status-dot"></i>{% if ai_enabled %}AI assistant online{% else
+        %}Care guide online{% endif %}</span
+      >
+    </div>
+    <div
+      id="chat-messages"
+      class="chat-messages"
+      aria-live="polite"
+      aria-relevant="additions text"
+    >
+      <div class="chat-bubble bot">
+        <strong
+          id="chat-greeting"
+          data-first-name="{{ request.user.first_name|default:request.user.username }}"
+          >Hello!</strong
+        >
+        Choose a project feature to see guided questions, or type your own
+        question.<br /><br />
+        নমস্কার! project-এর feature বেছে ধাপে ধাপে প্রশ্ন করুন, অথবা নিজের
+        প্রশ্ন লিখুন। MediCore-এর তথ্য আপনার account permission ও project data
+        থেকে আসবে।
+      </div>
+      <div class="chat-options" aria-label="Choose a feature">
+        {% for option in guided_options %}
+        <button
+          class="chat-option"
+          type="button"
+          data-chat-option="{{ option.value }}"
+        >
+          {{ option.label }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+    <form id="chat-form" class="chat-composer">
+      {% csrf_token %}
+      <label class="sr-only" for="chat-input">Your message</label>
+      <div class="chat-input-row">
+        <input
+          id="chat-input"
+          type="text"
+          maxlength="500"
+          placeholder="Ask about a doctor or type a question…"
+          autocomplete="off"
+          required
+        /><button type="submit" id="chat-send">
+          Send <span aria-hidden="true">↑</span>
+        </button>
+      </div>
+      <div id="chat-date-check" class="chat-date-check" hidden>
+        <label for="chat-date">অন্য তারিখে ডাক্তার দেখুন</label>
+        <input id="chat-date" type="date" />
+        <button id="chat-date-send" class="chat-option" type="button">
+          তারিখ অনুযায়ী খুঁজুন
+        </button>
+      </div>
+      <p class="chat-disclaimer">
+        General information only. This assistant cannot diagnose or prescribe.
+        Don’t share names, account details, or private medical information. {%
+        if ai_enabled %}General questions may be sent to the configured AI
+        provider; doctor searches use MediCore schedules.{% else %}AI replies
+        are not enabled yet; doctor search and booking guidance are available.{%
+        endif %}
+      </p>
+    </form>
+  </section>
+  <aside class="chat-sidebar">
+    <section class="chat-side-card">
+      <h3>Feature-by-feature help</h3>
+      <p>
+        Choose a topic in the chat to follow a guided path. Available topics
+        depend on your account role.
+      </p>
+      <ul>
+        <li>Appointments, schedules and records</li>
+        <li>Lab, pharmacy and billing</li>
+        <li>Nursing, home care and notifications</li>
+        <li>Account help and general questions</li>
+      </ul>
+    </section>
+    <section class="chat-side-card">
+      <h3>Live project information</h3>
+      <p>
+        Doctor availability, appointment status, personal records, bills and
+        notifications are read from MediCore data. The assistant will not make
+        changes or bookings for you.
+      </p>
+    </section>
+    <div class="public-chat-note">
+      <strong>Need urgent help?</strong> Chat is not an emergency service.
+      Contact local emergency services or go to the nearest emergency
+      department.
+    </div>
+  </aside>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  (() => {
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("chat-input");
+    const messages = document.getElementById("chat-messages");
+    const send = document.getElementById("chat-send");
+    const dateInput = document.getElementById("chat-date");
+    const dateSend = document.getElementById("chat-date-send");
+    const datePanel = document.getElementById("chat-date-check");
+    const greeting = document.getElementById("chat-greeting");
+
+    if (greeting) {
+      const name = greeting.dataset.firstName || "there";
+      const hour = new Date().getHours();
+
+      let timeGreeting;
+
+      if (hour < 12) {
+        timeGreeting = "Good morning";
+      } else if (hour < 17) {
+        timeGreeting = "Good afternoon";
+      } else {
+        timeGreeting = "Good evening";
+      }
+
+      greeting.textContent = `${timeGreeting}, ${name}!`;
+    }
+    const endpoint = "{% url 'chatbot:api' %}";
+    const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    const now = new Date();
+    const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    dateInput.min = localToday;
+
+    function addBubble(text, type) {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${type}`;
+      bubble.textContent = text;
+      messages.appendChild(bubble);
+      messages.scrollTop = messages.scrollHeight;
+      return bubble;
+    }
+
+    function addDoctorResults(doctors) {
+      doctors.forEach((doctor) => {
+        const card = document.createElement("article");
+        card.className = "doctor-result";
+        const heading = document.createElement("div");
+        heading.className = "doctor-result-head";
+        const avatar = document.createElement("div");
+        avatar.className = "doctor-avatar";
+        avatar.textContent = (doctor.name || "D")
+          .trim()
+          .slice(0, 1)
+          .toUpperCase();
+        const headingText = document.createElement("div");
+        const title = document.createElement("h3");
+        title.textContent = doctor.name || "Doctor";
+        const speciality = document.createElement("p");
+        speciality.textContent =
+          doctor.specialization || doctor.department || "Medical specialist";
+        headingText.append(title, speciality);
+        heading.append(avatar, headingText);
+        card.appendChild(heading);
+
+        const details = document.createElement("p");
+        details.textContent = `${doctor.hospital || "Hospital not listed"} · Consultation fee: ${doctor.fee || "Ask the clinic"}`;
+        card.appendChild(details);
+
+        if (doctor.date && Array.isArray(doctor.slots) && doctor.slots.length) {
+          const available = document.createElement("p");
+          available.textContent = `Available slots · ${doctor.date}`;
+          card.appendChild(available);
+          const slotList = document.createElement("div");
+          slotList.className = "slot-list";
+          doctor.slots.forEach((slot) => {
+            const link = document.createElement("a");
+            link.className = "slot-link";
+            link.href = slot.booking_url;
+            link.textContent = `${slot.start}–${slot.end} · Book`;
+            slotList.appendChild(link);
+          });
+          card.appendChild(slotList);
+        } else if (doctor.date) {
+          const noSlots = document.createElement("p");
+          noSlots.textContent =
+            doctor.availability_message || "No slots found for this date.";
+          card.appendChild(noSlots);
+        }
+        messages.appendChild(card);
+      });
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addLinks(links) {
+      if (!Array.isArray(links) || !links.length) return;
+      const list = document.createElement("div");
+      list.className = "chat-links";
+      links.forEach((item) => {
+        const link = document.createElement("a");
+        link.className = "chat-link";
+        link.href = item.url;
+        link.textContent = item.label;
+        list.appendChild(link);
+      });
+      messages.appendChild(list);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addOptions(options) {
+      const choices =
+        Array.isArray(options) && options.length
+          ? options
+          : [{ label: "← Main menu", value: "menu:start" }];
+      const wrapper = document.createElement("div");
+      wrapper.className = "chat-options";
+      choices.forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "chat-option";
+        button.textContent = item.label;
+        button.dataset.chatOption = item.value;
+        wrapper.appendChild(button);
+      });
+      messages.appendChild(wrapper);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendMessage(message) {
+      if (!message || send.disabled) return;
+      addBubble(message, "user");
+      if (input.value.trim() === message) input.value = "";
+      send.disabled = true;
+      const waiting = addBubble("…", "bot");
+      waiting.setAttribute("aria-label", "Assistant is thinking");
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({ message }),
+        });
+        const data = await response.json();
+        waiting.remove();
+        addBubble(data.reply || "Sorry, no response was returned.", "bot");
+        if (Array.isArray(data.doctors)) addDoctorResults(data.doctors);
+        addLinks(data.links);
+        addOptions(data.options);
+        datePanel.hidden = !data.date_picker;
+      } catch (_error) {
+        waiting.remove();
+        addBubble(
+          "I couldn't connect just now. Please try again or browse doctors directly.",
+          "bot",
+        );
+      } finally {
+        send.disabled = false;
+        input.focus();
+      }
+    }
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-chat-option]");
+      if (!button) return;
+      if (button.dataset.chatOption === "action:choose_date")
+        datePanel.hidden = false;
+      sendMessage(button.dataset.chatOption);
+    });
+
+    dateSend.addEventListener("click", () => {
+      if (!dateInput.value) {
+        dateInput.focus();
+        return;
+      }
+      datePanel.hidden = true;
+      sendMessage(`available doctors on ${dateInput.value}`);
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      sendMessage(input.value.trim());
+    });
+  })();
+</script>
+{% endblock %}

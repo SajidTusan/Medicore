@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Doctor Profile</h1>
+        <p class="text-muted">
+            Your professional information
+        </p>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    {% if profile %}
+
+        <div class="profile-header">
+
+            <div class="profile-avatar">
+                {{ request.user.first_name|first|upper }}
+            </div>
+
+            <div>
+
+                <h2>
+                    Dr. {{ request.user.get_full_name }}
+                </h2>
+
+                <p class="text-muted">
+                    {{ request.user.public_id }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-grid">
+
+            <div>
+                <label>Specialization</label>
+                <p>
+                    {{ profile.specialization|default:"Not added" }}
+                </p>
+            </div>
+
+
+            <div>
+                <label>Qualification</label>
+                <p>
+                    {{ profile.qualification|default:"Not added" }}
+                </p>
+            </div>
+
+
+            <div>
+                <label>Experience</label>
+                <p>
+                    {{ profile.experience_years }} years
+                </p>
+            </div>
+
+
+            <div>
+                <label>License Number</label>
+                <p>
+                    {{ profile.license_number|default:"Not added" }}
+                </p>
+            </div>
+
+
+            <div>
+                <label>Hospital</label>
+                <p>
+                    {{ profile.hospital|default:"Not assigned" }}
+                </p>
+            </div>
+
+
+            <div>
+                <label>Department</label>
+                <p>
+                    {{ profile.department|default:"Not assigned" }}
+                </p>
+            </div>
+
+
+            <div>
+                <label>Phone</label>
+                <p>
+                    {{ profile.phone|default:"Not added" }}
+                </p>
+            </div>
+
+
+            <div>
+                <label>Consultation Fee</label>
+                <p>
+                    ৳{{ profile.consultation_fee }}
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="profile-bio">
+
+            <h3>About</h3>
+
+            <p>
+                {{ profile.bio|default:"No biography added yet." }}
+            </p>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>Doctor profile not found</h3>
+
+            <p>
+                Please contact the administrator.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

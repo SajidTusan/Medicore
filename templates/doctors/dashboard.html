@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Doctor overview | MediCore{% endblock %}
+{% block page_heading %}Doctor overview{% endblock %}
+{% block content %}
+<div class="page-header"><div><p class="eyebrow">CLINIC WORKSPACE</p><h1>Welcome back, Dr. {{ request.user.first_name|default:request.user.username }}.</h1><p>Your schedule and patient care at a glance.</p></div><a class="btn btn-primary" href="{% url 'doctors:appointments' %}">Open appointments <span aria-hidden="true">→</span></a></div>
+<div class="dashboard-grid">
+  <article class="card stat-card"><span class="stat-label">Today's visits</span><div class="stat-value">{{ today_count }}</div><span class="stat-note">Scheduled for today</span></article>
+  <article class="card stat-card"><span class="stat-label">Patients seen</span><div class="stat-value">{{ patient_count }}</div><span class="stat-note">Patients with an appointment</span></article>
+  <article class="card stat-card"><span class="stat-label">Completed visits</span><div class="stat-value">{{ completed_count }}</div><span class="stat-note">Completed consultations</span></article>
+  <article class="card stat-card"><span class="stat-label">Upcoming visits</span><div class="stat-value">{{ upcoming_count }}</div><span class="stat-note">Pending and confirmed</span></article>
+</div>
+<section class="card">
+  <div class="card-header"><div><h2 class="card-title">Today's schedule</h2><p class="text-muted" style="margin:5px 0 0;font-size:12px">Patients booked for today.</p></div><a class="text-link" href="{% url 'doctors:appointments' %}">View all →</a></div>
+  {% if today_appointments %}<div class="table-wrap"><table><thead><tr><th>Time</th><th>Patient</th><th>Department</th><th>Status</th><th></th></tr></thead><tbody>{% for appointment in today_appointments %}<tr><td>{{ appointment.start_time|time:"g:i A" }}</td><td><strong>{{ appointment.patient.get_full_name|default:appointment.patient.username }}</strong></td><td>{{ appointment.department.name }}</td><td><span class="badge {% if appointment.status == 'CONFIRMED' %}badge-success{% else %}badge-warning{% endif %}">{{ appointment.get_status_display }}</span></td><td><a class="text-link" href="{% url 'medical_records:create_consultation' appointment.id %}">Open visit</a></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><strong>No visits on today's schedule</strong>Your appointments will appear here when they're booked.</div>{% endif %}
+</section>
+<div class="quick-actions" style="margin-top:18px"><a class="btn btn-secondary" href="{% url 'schedule_manager:list' %}">Manage schedule</a><a class="btn btn-secondary" href="{% url 'doctors:profile' %}">View profile</a></div>
+{% endblock %}

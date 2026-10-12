@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+
+        <h1>Dispense Medicine</h1>
+
+        <p>
+            Prescription:
+            {{ prescription.prescription_id }}
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h2>Patient</h2>
+
+            <p>
+                <strong>Name:</strong>
+                {{ prescription.patient.get_full_name }}
+            </p>
+
+            <p>
+                <strong>Patient ID:</strong>
+                {{ prescription.patient.public_id }}
+            </p>
+
+            <hr>
+
+            <h2>Prescribed Medicines</h2>
+
+            <ul>
+
+                {% for medicine in prescription.medicines.all %}
+
+                    <li>
+                        <strong>
+                            {{ medicine.medicine_name }}
+                        </strong>
+                        -
+                        {{ medicine.dosage }}
+                        -
+                        {{ medicine.frequency }}
+                        -
+                        {{ medicine.duration }}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+            <hr>
+
+            <h2>Dispensing</h2>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Dispense Medicine
+                </button>
+
+                <a
+                    href="{% url 'pharmacy:prescriptions' %}"
+                    class="btn btn-secondary"
+                >
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
