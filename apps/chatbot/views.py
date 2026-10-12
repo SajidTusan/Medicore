@@ -16,7 +16,7 @@ def chatbot_page(request):
         request,
         "chatbot/chat.html",
         {
-            "ai_enabled": bool(getattr(settings, "OPENAI_API_KEY", "")),
+            "ai_enabled": bool(getattr(settings, "GEMINI_API_KEY", "")),
             "guided_options": get_start_options(request.user.role),
         },
     )

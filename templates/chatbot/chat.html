@@ -15,28 +15,46 @@
   <section class="chat-panel" aria-label="MediCore assistant chat">
     <div class="chat-intro">
       <div class="chat-brand-mark" aria-hidden="true">✧</div>
+
       <div>
         <h2>MediCore care assistant</h2>
         <p>Here to help you find your next step.</p>
       </div>
+
       <span class="assistant-status">
         <i class="status-dot"></i>
         {% if ai_enabled %}AI assistant online{% else %}Care guide online{% endif %}
       </span>
     </div>
 
-    <div id="chat-messages" class="chat-messages" aria-live="polite" aria-relevant="additions text">
+    <div
+      id="chat-messages"
+      class="chat-messages"
+      aria-live="polite"
+      aria-relevant="additions text"
+    >
       <div class="chat-bubble bot">
-        <strong id="chat-greeting" data-first-name="{{ request.user.first_name|default:request.user.username }}">Hello!</strong>
-        Choose a MediCore feature to see guided questions, or type your own question.
+        <strong
+          id="chat-greeting"
+          data-first-name="{{ request.user.first_name|default:request.user.username }}"
+        >Hello!</strong>
+
+        Choose a MediCore feature to see guided questions, or type your own
+        question. Answers about MediCore records use your account permissions
+        and live project data.
         <br><br>
-        Hello! MediCore-এর feature বেছে ধাপে ধাপে প্রশ্ন করুন, অথবা নিজের প্রশ্ন লিখুন।
-        MediCore-এর তথ্য আপনার account permission ও Previous data থেকে আসবে।
+        Hello! MediCore-এর feature বেছে ধাপে ধাপে প্রশ্ন করুন, অথবা নিজের
+        প্রশ্ন লিখুন। MediCore-এর তথ্য আপনার account permission ও previous data
+        থেকে আসবে।
       </div>
 
       <div class="chat-options" aria-label="Choose a feature">
         {% for option in guided_options %}
-          <button class="chat-option" type="button" data-chat-option="{{ option.value }}">
+          <button
+            class="chat-option"
+            type="button"
+            data-chat-option="{{ option.value }}"
+          >
             {{ option.label }}
           </button>
         {% endfor %}
@@ -45,6 +63,7 @@
 
     <form id="chat-form" class="chat-composer">
       {% csrf_token %}
+
       <label class="sr-only" for="chat-input">Your message</label>
 
       <div class="chat-input-row">
@@ -56,6 +75,7 @@
           autocomplete="off"
           required
         >
+
         <button type="submit" id="chat-send">
           Send <span aria-hidden="true">↑</span>
         </button>
@@ -70,12 +90,14 @@
       </div>
 
       <p class="chat-disclaimer">
-        General information only. This assistant cannot diagnose or prescribe.
-        Don’t share names, account details, or private medical information.
+        AI-এর উত্তর সাধারণ তথ্য—এটি diagnosis বা prescription নয় এবং ভুল হতে
+        পারে। ব্যক্তিগত চিকিৎসার জন্য qualified doctor-এর সঙ্গে কথা বলুন;
+        জরুরি অবস্থায় স্থানীয় emergency service-এ যোগাযোগ করুন। এখানে নাম,
+        account details বা ব্যক্তিগত medical information দেবেন না।
         {% if ai_enabled %}
-          General questions may be sent to the configured AI provider; doctor searches use MediCore schedules.
+          স্বাস্থ্য-তথ্যের source link উত্তরটির নিচে দেখানো হবে।
         {% else %}
-          AI replies are not enabled yet; doctor search and booking guidance are available.
+          AI service চালু নেই; doctor search ও booking guidance ব্যবহার করতে পারেন।
         {% endif %}
       </p>
     </form>
@@ -84,7 +106,10 @@
   <aside class="chat-sidebar">
     <section class="chat-side-card">
       <h3>Feature-by-feature help</h3>
-      <p>Choose a topic in the chat to follow a guided path. Available topics depend on your account role.</p>
+      <p>
+        Choose a topic in the chat to follow a guided path. Available topics
+        depend on your account role.
+      </p>
       <ul>
         <li>Appointments, schedules and records</li>
         <li>Lab, pharmacy and billing</li>
@@ -96,14 +121,16 @@
     <section class="chat-side-card">
       <h3>Live project information</h3>
       <p>
-        Doctor availability, appointment status, personal records, bills and notifications
-        are read from MediCore data. The assistant will not make changes or bookings for you.
+        Doctor availability, appointment status, personal records, bills and
+        notifications are read from MediCore data. The assistant will not make
+        changes or bookings for you.
       </p>
     </section>
 
     <div class="public-chat-note">
       <strong>Need urgent help?</strong> Chat is not an emergency service.
-      Contact local emergency services or go to the nearest emergency department.
+      Contact local emergency services or go to the nearest emergency
+      department.
     </div>
   </aside>
 </div>
@@ -147,6 +174,7 @@
   const now = new Date();
   const localToday =
     `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
   dateInput.min = localToday;
 
   function addBubble(text, type) {
@@ -171,11 +199,13 @@
       avatar.textContent = (doctor.name || "D").trim().slice(0, 1).toUpperCase();
 
       const headingText = document.createElement("div");
+
       const title = document.createElement("h3");
       title.textContent = doctor.name || "Doctor";
 
       const speciality = document.createElement("p");
-      speciality.textContent = doctor.specialization || doctor.department || "Medical specialist";
+      speciality.textContent =
+        doctor.specialization || doctor.department || "Medical specialist";
 
       headingText.append(title, speciality);
       heading.append(avatar, headingText);
@@ -205,7 +235,8 @@
         card.appendChild(slotList);
       } else if (doctor.date) {
         const noSlots = document.createElement("p");
-        noSlots.textContent = doctor.availability_message || "No slots found for this date.";
+        noSlots.textContent =
+          doctor.availability_message || "No slots found for this date.";
         card.appendChild(noSlots);
       }
 
@@ -258,7 +289,10 @@
     if (!message || send.disabled) return;
 
     addBubble(message, "user");
-    if (input.value.trim() === message) input.value = "";
+
+    if (input.value.trim() === message) {
+      input.value = "";
+    }
 
     send.disabled = true;
     const waiting = addBubble("…", "bot");
@@ -269,16 +303,20 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken
+          "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message }),
       });
 
       const data = await response.json();
       waiting.remove();
 
       addBubble(data.reply || "Sorry, no response was returned.", "bot");
-      if (Array.isArray(data.doctors)) addDoctorResults(data.doctors);
+
+      if (Array.isArray(data.doctors)) {
+        addDoctorResults(data.doctors);
+      }
+
       addLinks(data.links);
       addOptions(data.options);
       datePanel.hidden = !data.date_picker;
