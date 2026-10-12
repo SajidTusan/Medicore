@@ -1,0 +1,39 @@
+*   [33m2d5215e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m Preserve original MediCore commit history
+[31m|[m[32m\[m  
+[31m|[m * [33m8557542[m[33m ([m[1;31moriginal-zip/master[m[33m)[m Ai Chatbot Create
+[31m|[m * [33m1bfac1b[m Harden nurse home care validation
+[31m|[m * [33m435bc91[m Complete nurse home care request workflow
+[31m|[m * [33m39d2750[m Harden billing payments and notifications
+[31m|[m * [33m1cdc70b[m Harden lab workflow and pharmacy dispensing
+[31m|[m * [33m4679181[m Add secure doctor patient medical history
+[31m|[m * [33ma525979[m Harden consultation relationship security
+[31m|[m * [33m6bee0ff[m Require consultation before completing appointment
+[31m|[m * [33ma384e34[m Secure prescription and lab order workflow
+[31m|[m * [33m8c9e8a2[m Harden consultation creation workflow
+[31m|[m * [33m6c7e719[m Add secure doctor appointment management
+[31m|[m * [33me500f60[m Add secure patient appointment cancellation
+[31m|[m * [33m67e265b[m Harden appointment booking security
+[31m|[m * [33md178a11[m Prevent duplicate active appointment slots
+[31m|[m * [33m2787778[m Fix nurse schedule conflict validation
+[31m|[m * [33m3edbe00[m Add global search system
+[31m|[m * [33m7f33fc5[m Add notification system and home-care notifications
+[31m|[m * [33m0744c3f[m complete home care service and review workflow
+[31m|[m * [33m17d9b08[m add nurse home care availability and request workflow
+[31m|[m * [33mdaf3266[m add nurse home care marketplace foundation
+[31m|[m * [33me5d445d[m add billing payment workflow
+[31m|[m * [33m0ce9efa[m add billing models and admin
+[31m|[m * [33m9a14ce8[m refine pharmacy dispensing workflow
+[31m|[m * [33m1363f42[m Implement schedule management engine
+[31m|[m * [33m6e42b26[m Data Upload
+[31m|[m * [33m354a9c4[m Implement doctor management foundation
+[31m|[m * [33m5af6b14[m Add hospital and department structure
+[31m|[m * [33mf25d7b0[m Add patient doctor and nurse profiles
+[31m|[m * [33me9a5143[m Add MediCore authentication foundation
+[31m|[m * [33m2eb1dc8[m Add MediCore public user ID generation
+[31m|[m * [33m480e0f3[m Add custom MediCore user model
+[31m|[m * [33m59464a3[m Create core MediCore applications
+[31m|[m * [33m4f30d14[m Create MediCore UI design system
+[31m|[m * [33m46e7152[m Configure MediCore project foundation
+[31m|[m * [33mcd5f993[m Initialize MediCore Django project
+* [33m63ce685[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mbackup-before-old-history[m[33m)[m Update README.md
+* [33m36722fc[m Update MediCore chatbot and configuration example
