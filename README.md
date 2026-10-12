@@ -1,6 +1,6 @@
 # MediCore
 
-MediCore is a Django healthcare coordination portal with role-based dashboards for patients, doctors, nurses, laboratory staff, pharmacists, receptionists and administrators.
+MediCore is a Django healthcare coordination portal with role based dashboards for patients, doctors, nurses, laboratory staff, pharmacists, receptionists and administrators.
 
 ## Features
 
