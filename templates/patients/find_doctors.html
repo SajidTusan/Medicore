@@ -1,173 +1,174 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
 <div class="page-header">
-    <div>
-        <p class="eyebrow">Patient Portal</p>
+  <div>
+    <p class="eyebrow">Patient Portal</p>
 
-        <h1>Find a Doctor</h1>
+    <h1>Find a Doctor</h1>
 
-        <p class="text-muted">
-            Find doctors by name, specialization, or department.
-        </p>
-    </div>
+    <p class="text-muted">
+      Find doctors by name, specialization, or department.
+    </p>
+  </div>
 </div>
-
 
 <div class="card">
+  <form method="get">
+    <div class="form-group">
+      <label for="doctor-search"> Search Doctor </label>
 
-    <form method="get">
+      <input
+        id="doctor-search"
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="e.g. Cardiologist, Dermatologist, Rahman..."
+      />
+    </div>
+    {% if selected_department %}
+    <input
+      type="hidden"
+      name="department"
+      value="{{ selected_department.id }}"
+    />
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Search</button>
 
-        <div class="form-group">
-
-            <label for="doctor-search">
-                Search Doctor
-            </label>
-
-            <input
-                id="doctor-search"
-                type="text"
-                name="q"
-                value="{{ query }}"
-                placeholder="e.g. Cardiologist, Dermatologist, Rahman..."
-            >
-
-        </div>
-
-        <button
-            type="submit"
-            class="btn btn-primary"
-        >
-            Search
-        </button>
-
-        {% if query %}
-            <a
-                href="{% url 'patients:find_doctors' %}"
-                class="btn"
-            >
-                Clear
-            </a>
-        {% endif %}
-
-    </form>
-
+    {% if query %}
+    <a href="{% url 'patients:find_doctors' %}" class="btn"> Clear </a>
+    {% endif %}
+  </form>
 </div>
-
-
 <div class="page-section">
-
-    <div class="section-header">
-
-        <div>
-            <h2>Available Doctors</h2>
-
-            <p class="text-muted">
-                {{ doctors|length }} doctor{{ doctors|length|pluralize }} found.
-            </p>
-        </div>
-
+  <div class="section-header">
+    <div>
+      <h2>Browse by Department</h2>
+      <p class="text-muted">Choose a medical department to see its doctors.</p>
     </div>
 
-
-    {% if doctors %}
-
-        <div class="doctor-grid">
-
-            {% for doctor in doctors %}
-
-                <div class="card doctor-card">
-
-                    <div class="doctor-card-header">
-
-                        <div class="doctor-avatar">
-                            {{ doctor.user.first_name|first|upper }}
-                        </div>
-
-                        <div>
-
-                            <h3>
-                                Dr. {{ doctor.user.get_full_name }}
-                            </h3>
-
-                            <p class="text-muted">
-                                {{ doctor.specialization|default:"General Physician" }}
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="doctor-card-body">
-
-                        {% if doctor.qualification %}
-                            <p>
-                                <strong>Qualification:</strong>
-                                {{ doctor.qualification }}
-                            </p>
-                        {% endif %}
-
-                        <p>
-                            <strong>Experience:</strong>
-                            {{ doctor.experience_years }} years
-                        </p>
-
-                        {% if doctor.department %}
-                            <p>
-                                <strong>Department:</strong>
-                                {{ doctor.department.name }}
-                            </p>
-                        {% endif %}
-
-                        {% if doctor.hospital %}
-                            <p>
-                                <strong>Hospital:</strong>
-                                {{ doctor.hospital.name }}
-                            </p>
-                        {% endif %}
-
-                        <p>
-                            <strong>Consultation:</strong>
-                            ৳{{ doctor.consultation_fee }}
-                        </p>
-
-                    </div>
-
-
-                    <div class="doctor-card-footer">
-
-                        <a
-                            href="{% url 'patients:doctor_detail' doctor.id %}"
-                            class="btn btn-primary"
-                        >
-                            View Profile
-                        </a>
-
-                    </div>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-    {% else %}
-
-        <div class="card empty-state">
-
-            <h3>No doctors found</h3>
-
-            <p class="text-muted">
-                Try searching with another doctor name,
-                specialization, or department.
-            </p>
-
-        </div>
-
+    {% if selected_department %}
+    <a
+      class="btn btn-secondary"
+      href="{% url 'patients:find_doctors' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+    >
+      All departments
+    </a>
     {% endif %}
+  </div>
 
+  <div class="department-list">
+    {% for department in departments %}
+    <a
+      class="department-option{% if selected_department.id == department.id %} active{% endif %}"
+      href="?department={{ department.id }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}"
+    >
+      <span class="department-option-name">
+        <strong>{{ department.name }}</strong>
+        <small>{{ department.hospital.name }}</small>
+      </span>
+
+      <span class="badge badge-neutral">
+        {{ department.doctor_count }} doctor{{ department.doctor_count|pluralize
+        }}
+      </span>
+    </a>
+    {% empty %}
+    <div class="card empty-state">
+      No medical departments are available right now.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="page-section">
+  <div class="section-header">
+    <div>
+      <h2>
+        {% if selected_department %} {{ selected_department.name }} Doctors {%
+        else %} Available Doctors {% endif %}
+      </h2>
+
+      <p class="text-muted">
+        {{ doctors|length }} doctor{{ doctors|length|pluralize }} found.
+      </p>
+    </div>
+  </div>
+
+  {% if doctors %}
+
+  <div class="doctor-grid">
+    {% for doctor in doctors %}
+
+    <div class="card doctor-card">
+      <div class="doctor-card-header">
+        <div class="doctor-avatar">
+          {{ doctor.user.first_name|first|upper }}
+        </div>
+
+        <div>
+          <h3>Dr. {{ doctor.user.get_full_name }}</h3>
+
+          <p class="text-muted">
+            {{ doctor.specialization|default:"General Physician" }}
+          </p>
+        </div>
+      </div>
+
+      <div class="doctor-card-body">
+        {% if doctor.qualification %}
+        <p>
+          <strong>Qualification:</strong>
+          {{ doctor.qualification }}
+        </p>
+        {% endif %}
+
+        <p>
+          <strong>Experience:</strong>
+          {{ doctor.experience_years }} years
+        </p>
+
+        {% if doctor.department %}
+        <p>
+          <strong>Department:</strong>
+          {{ doctor.department.name }}
+        </p>
+        {% endif %} {% if doctor.hospital %}
+        <p>
+          <strong>Hospital:</strong>
+          {{ doctor.hospital.name }}
+        </p>
+        {% endif %}
+
+        <p>
+          <strong>Consultation:</strong>
+          ৳{{ doctor.consultation_fee }}
+        </p>
+      </div>
+
+      <div class="doctor-card-footer">
+        <a
+          href="{% url 'patients:doctor_detail' doctor.id %}"
+          class="btn btn-primary"
+        >
+          View Profile
+        </a>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  {% else %}
+
+  <div class="card empty-state">
+    <h3>No doctors found</h3>
+
+    <p class="text-muted">
+      Try searching with another doctor name, specialization, or department.
+    </p>
+  </div>
+
+  {% endif %}
 </div>
 
 {% endblock %}

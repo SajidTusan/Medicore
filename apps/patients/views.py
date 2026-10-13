@@ -6,16 +6,21 @@ from apps.appointments.services import get_available_slots
 from apps.doctors.models import DoctorProfile
 from apps.appointments.models import Appointment
 from apps.medical_records.models import Prescription
-from apps.medical_records.models import (Consultation,Prescription,LabTestOrder,)
+from apps.medical_records.models import (
+    Consultation,
+    Prescription,
+    LabTestOrder,
+)
 from django.shortcuts import render
 from apps.accounts.decorators import role_required
+from apps.hospitals.models import Department
+
 
 @login_required
 @role_required("PATIENT")
 def patient_dashboard(request):
     upcoming_appointments = (
-        Appointment.objects
-        .filter(
+        Appointment.objects.filter(
             patient=request.user,
             date__gte=timezone.localdate(),
             status__in=[Appointment.Status.PENDING, Appointment.Status.CONFIRMED],
@@ -29,10 +34,15 @@ def patient_dashboard(request):
         {
             "upcoming_appointments": upcoming_appointments[:5],
             "appointment_count": upcoming_appointments.count(),
-            "lab_report_count": LabTestOrder.objects.filter(patient=request.user).count(),
-            "prescription_count": Prescription.objects.filter(patient=request.user).count(),
+            "lab_report_count": LabTestOrder.objects.filter(
+                patient=request.user
+            ).count(),
+            "prescription_count": Prescription.objects.filter(
+                patient=request.user
+            ).count(),
         },
     )
+
 
 @login_required
 @role_required("PATIENT")
@@ -41,11 +51,25 @@ def patient_profile(request):
         request,
         "patients/profile.html",
     )
+
+
 @login_required
 @role_required("PATIENT")
 def find_doctors(request):
-
     query = request.GET.get("q", "").strip()
+
+    departments = (
+        Department.objects.filter(is_active=True, hospital__is_active=True)
+        .select_related("hospital")
+        .annotate(doctor_count=models.Count("doctors"))
+        .order_by("name", "hospital__name")
+    )
+
+    department_id = request.GET.get("department", "").strip()
+    selected_department = None
+
+    if department_id.isdigit():
+        selected_department = departments.filter(pk=department_id).first()
 
     doctors = DoctorProfile.objects.select_related(
         "user",
@@ -53,20 +77,15 @@ def find_doctors(request):
         "department",
     ).all()
 
+    if selected_department:
+        doctors = doctors.filter(department=selected_department)
+
     if query:
         doctors = doctors.filter(
-            models.Q(
-                user__first_name__icontains=query
-            )
-            | models.Q(
-                user__last_name__icontains=query
-            )
-            | models.Q(
-                specialization__icontains=query
-            )
-            | models.Q(
-                department__name__icontains=query
-            )
+            models.Q(user__first_name__icontains=query)
+            | models.Q(user__last_name__icontains=query)
+            | models.Q(specialization__icontains=query)
+            | models.Q(department__name__icontains=query)
         )
 
     return render(
@@ -75,8 +94,11 @@ def find_doctors(request):
         {
             "doctors": doctors,
             "query": query,
+            "departments": departments,
+            "selected_department": selected_department,
         },
     )
+
 
 @login_required
 @role_required("PATIENT")
@@ -121,12 +143,12 @@ def doctor_detail(request, doctor_id):
         },
     )
 
+
 @login_required
 @role_required("PATIENT")
 def my_appointments(request):
     appointments = (
-        Appointment.objects
-        .filter(patient=request.user)
+        Appointment.objects.filter(patient=request.user)
         .select_related(
             "doctor__user",
             "doctor__hospital",
@@ -147,13 +169,13 @@ def my_appointments(request):
         },
     )
 
+
 @login_required
 @role_required("PATIENT")
 def my_prescriptions(request):
 
     prescriptions = (
-        Prescription.objects
-        .filter(
+        Prescription.objects.filter(
             patient=request.user,
         )
         .select_related(
@@ -182,8 +204,7 @@ def my_prescriptions(request):
 def my_lab_reports(request):
 
     reports = (
-        LabTestOrder.objects
-        .filter(
+        LabTestOrder.objects.filter(
             patient=request.user,
         )
         .select_related(
@@ -204,19 +225,18 @@ def my_lab_reports(request):
         },
     )
 
+
 @login_required
 @role_required("PATIENT")
 def medical_history(request):
     consultations = (
-        Consultation.objects
-        .filter(patient=request.user)
+        Consultation.objects.filter(patient=request.user)
         .select_related("doctor")
         .order_by("-created_at")
     )
 
     lab_reports = (
-        LabTestOrder.objects
-        .filter(
+        LabTestOrder.objects.filter(
             patient=request.user,
         )
         .select_related(
