@@ -16,12 +16,12 @@
       <h1>Sign in to MediCore</h1>
       <p>Use your account details to continue to your care portal.</p>
       {% if request.GET.registered %}<div class="message message-success">Your account is ready. Sign in to continue.</div>{% endif %}
-      {% if form.non_field_errors %}<div class="message message-error">{{ form.non_field_errors }}</div>{% endif %}
+      {% if form.non_field_errors %}<div class="message message-error">We couldn’t sign you in. Check that your username and password are correct, including capitalization. If you don’t have an account yet, create one below.</div>{% endif %}
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}" />
         <div class="form-group"><label for="id_username">Username</label><input id="id_username" name="username" type="text" autocomplete="username" required autofocus /></div>
-        <div class="form-group"><label for="id_password">Password</label><input id="id_password" name="password" type="password" autocomplete="current-password" required /></div>
+        <div class="form-group"><label for="id_password">Password</label><div class="login-password-input-wrap"><input id="id_password" name="password" type="password" autocomplete="current-password" required /><button class="login-password-toggle" type="button" data-password-toggle="id_password" aria-controls="id_password" aria-pressed="false">Show</button></div></div>
         <p style="margin:-8px 0 14px;text-align:right;font-size:11px"><a class="text-link" href="{% url 'password_reset' %}">Forgot password?</a></p>
         {% if form.errors and not form.non_field_errors %}<p class="field-errors">Please check your username and password.</p>{% endif %}
         <button class="btn btn-primary" type="submit">Sign in <span aria-hidden="true">→</span></button>

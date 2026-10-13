@@ -1,18 +1,12 @@
-{% extends "base.html" %} {% block title %}Create account | MediCore{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% block title %}Create account | MediCore{% endblock %}
+{% block content %}
 <div class="auth-wrap">
   <aside class="auth-aside">
     <div>
-      <a class="brand" href="{% url 'home' %}"
-        ><span class="brand-icon">✚</span
-        ><span class="brand-copy"
-          ><strong>MediCore</strong><small>Care, connected.</small></span
-        ></a
-      >
+      <a class="brand" href="{% url 'home' %}"><span class="brand-icon">✚</span><span class="brand-copy"><strong>MediCore</strong><small>Care, connected.</small></span></a>
       <h2>A little easier, every step.</h2>
-      <p>
-        Create your patient account to find care, request appointments and keep
-        your health information close at hand.
-      </p>
+      <p>Create your patient account to find care, request appointments and keep your health information close at hand.</p>
     </div>
     <div class="auth-aside-foot">Private account. Personal care.</div>
   </aside>
@@ -22,73 +16,51 @@
       <h1>Create your account</h1>
       <p>It only takes a moment to get started.</p>
       <form method="post" novalidate>
-        {% csrf_token %} {% for field in form %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-
-          {% if field.name == "password1" or field.name == "password2" %}
-          <div class="password-input-wrap">
-            {{ field }}
-            <button
-              type="button"
-              class="password-toggle"
-              data-password-target="{{ field.id_for_label }}"
-              aria-label="Show password"
-              aria-pressed="false"
-            >
-              Show
-            </button>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% if field.name == "password1" or field.name == "password2" %}
+              <div class="signup-password-input-wrap">
+                {{ field }}
+                <button type="button" class="signup-password-toggle" data-password-target="{{ field.id_for_label }}" aria-label="Show password" aria-pressed="false">Show</button>
+              </div>
+            {% else %}
+              {{ field }}
+            {% endif %}
+            {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
+            {{ field.errors }}
+            {% if field.name == "username" and form.username_suggestions %}
+              <div class="username-suggestions">
+                <span>Try one of these:</span>
+                {% for suggestion in form.username_suggestions %}
+                  <button class="username-suggestion" type="button" data-username-suggestion="{{ suggestion }}">{{ suggestion }}</button>
+                {% endfor %}
+              </div>
+            {% endif %}
           </div>
-          {% else %} {{ field }} {% endif %} {% if field.help_text %}
-          <div class="helptext">{{ field.help_text|safe }}</div>
-          {% endif %} {{ field.errors }}
-        </div>
         {% endfor %}
-        <button class="btn btn-primary" type="submit">
-          Create patient account <span aria-hidden="true">→</span>
-        </button>
+        <button class="btn btn-primary" type="submit">Create patient account <span aria-hidden="true">→</span></button>
       </form>
-      <p class="auth-switch">
-        Already registered? <a href="{% url 'login' %}">Sign in</a>
-      </p>
+      <p class="auth-switch">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
     </div>
   </section>
 </div>
 <style>
-  .password-input-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .password-input-wrap input {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .password-toggle {
-    padding: 8px 12px;
-    border: 1px solid #d0d5dd;
-    border-radius: 8px;
-    background: #fff;
-    cursor: pointer;
-  }
+  .signup-password-input-wrap { display: flex; align-items: center; gap: 8px; }
+  .signup-password-input-wrap input { flex: 1; min-width: 0; }
+  .signup-password-toggle { padding: 8px 12px; border: 1px solid #d0d5dd; border-radius: 8px; background: #fff; cursor: pointer; }
 </style>
-
 <script>
-  document.querySelectorAll(".password-toggle").forEach((button) => {
+  document.querySelectorAll(".signup-password-toggle").forEach((button) => {
     button.addEventListener("click", () => {
       const input = document.getElementById(button.dataset.passwordTarget);
       if (!input) return;
-
-      const isHidden = input.type === "password";
-      input.type = isHidden ? "text" : "password";
-      button.textContent = isHidden ? "Hide" : "Show";
-      button.setAttribute(
-        "aria-label",
-        isHidden ? "Hide password" : "Show password",
-      );
-      button.setAttribute("aria-pressed", String(isHidden));
+      const showing = input.type === "password";
+      input.type = showing ? "text" : "password";
+      button.textContent = showing ? "Hide" : "Show";
+      button.setAttribute("aria-label", showing ? "Hide password" : "Show password");
+      button.setAttribute("aria-pressed", String(showing));
     });
   });
 </script>

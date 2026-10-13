@@ -44,6 +44,12 @@
 .auth-form-inner > p { margin-bottom: 23px; color: var(--muted); font-size: 13px; }
 .auth-form-inner form { width: 100%; }
 .auth-form-inner .btn { width: 100%; margin-top: 4px; }
+.login-password-input-wrap { position: relative; }
+.login-password-input-wrap input { padding-right: 66px !important; }
+.login-password-toggle { position: absolute; top: 50%; right: 11px; padding: 4px; transform: translateY(-50%); border: 0; background: transparent; color: var(--primary-dark); font-size: 11px; font-weight: 700; cursor: pointer; }
+.username-suggestions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; color: var(--muted); font-size: 11px; }
+.username-suggestion { padding: 4px 8px; border: 1px solid var(--border); border-radius: 7px; background: #f7faf9; color: var(--primary-dark); font: inherit; cursor: pointer; }
+.username-suggestion:hover { border-color: var(--primary); background: var(--primary-soft); }
 .auth-switch { margin: 17px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
 .auth-switch a { color: var(--primary); font-weight: 700; }
 .auth-form-inner ul { margin: 6px 0 12px; padding-left: 18px; color: var(--muted); font-size: 11px; }
